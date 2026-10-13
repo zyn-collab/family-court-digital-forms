@@ -1,19 +1,12 @@
-/* ===========================================================================
- * api-config.js — REAL-BACKEND data layer (drop-in replacement for
- * browser-store.js). It exposes the exact same window.DataStore
- * interface, but talks to the reference backend
- * over HTTP instead of localStorage.
+/*
+ * Backend data layer: the same window.DataStore interface as browser-store.js,
+ * but every call goes to the backend service over HTTP.
  *
- * NOT loaded by any page yet — the app still uses browser-store.js
- * (localStorage). To switch a page to the backend, change its script tag:
- *     <script src="js/browser-store.js"></script>
- *   →  <script src="js/api-config.js"></script>
- * and set the API base URL once (before init), e.g.:
- * <script>window.FC_API_BASE = 'https://api.familycourt.gov.mv';</script>
- *
- * The method signatures, return shapes, and behaviours match browser-store.js
- * exactly, so the rest of the app needs no changes.
- * =========================================================================== */
+ * Which layer a page uses is decided by js/site-config.js (FC_API_BASE) and
+ * js/data-layer.js: with an address set the pages load this file; with it empty
+ * they load browser-store.js and keep data in the browser. admin.html always loads
+ * this file. The endpoint contract is backend/openapi.yaml.
+ */
 
 window.DataStore = (function () {
   function base() { return (window.FC_API_BASE || 'http://localhost:4000').replace(/\/$/, ''); }
