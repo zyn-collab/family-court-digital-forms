@@ -149,6 +149,9 @@ window.DataStore = (function () {
     return (r && r.audit) || [];
   }
 
+  // archive / restore a case on the server (officer+)
+  async function setArchived(ref, archived) { return api('POST', '/api/admin/submissions/' + encodeURIComponent(ref) + '/archive', { archived: archived }, true); }
+
   // staff accounts (admin role) — the admin page's "Staff accounts" panel
   async function listUsers() { const r = await api('GET', '/api/admin/users', null, true); return (r && r.users) || []; }
   async function createUser(u) { return api('POST', '/api/admin/users', u, true); }
@@ -157,7 +160,7 @@ window.DataStore = (function () {
 
   return {
     init, isOnline, getDb, generateRefCode, newRefCode,
-    listUsers, createUser, setUserActive, setUserPassword,
+    listUsers, createUser, setUserActive, setUserPassword, setArchived,
     saveDraft, loadDraft, deleteDraft,
     saveSubmission, getSubmissionStatus, updateSubmissionStatus, listSubmissions,
     getSubmissionFull, submitCorrection,

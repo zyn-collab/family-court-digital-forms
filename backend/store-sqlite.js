@@ -121,6 +121,7 @@ function createStore(opts) {
       id_number: row.id_number == null ? '' : row.id_number,
       form_code: row.form_code == null ? '' : row.form_code,
       attachments: row.attachments == null ? [] : JSON.parse(row.attachments),
+      archived_at: row.archived_at == null ? null : row.archived_at,
       history: reassembleHistory(row.ref_code)
     };
   }
@@ -213,6 +214,11 @@ function createStore(opts) {
     },
     // status row + history entry in ONE transaction (a crash between the two can
     // never leave a status without its timeline row)
+    // archive marker: an epoch-ms timestamp, or null to restore. Returns false if the case is unknown.
+    setArchived(ref, ts) {
+      const info = prep('setArchived', 'UPDATE submissions SET archived_at = ? WHERE ref_code = ?').run(ts == null ? null : ts, ref);
+      return info.changes > 0;
+    },
     updateStatus(ref, status, statusDv, entry) {
       db.exec('BEGIN');
       try {

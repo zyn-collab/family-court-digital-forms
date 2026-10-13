@@ -147,6 +147,18 @@ paths:
         "200": { description: changed }
         "400": { description: bad status }
         "403": { description: viewer role }
+  /api/admin/submissions/{ref}/archive:
+    parameters: [ { $ref: "#/components/parameters/ref" } ]
+    post:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Archive or restore a case (officer+; audited as archive / restore)
+      description: An archived case leaves the default worklist for every officer. Nothing is deleted.
+      requestBody: { content: { application/json: { schema: { type: object, properties: { archived: { type: boolean, default: true } } } } } }
+      responses:
+        "200": { description: changed }
+        "403": { description: viewer role }
+        "404": { description: unknown case }
   /api/admin/audit:
     get:
       tags: [admin]
@@ -192,7 +204,7 @@ paths:
       requestBody: { content: { application/json: { schema: { type: object, required: [username, display_name, role, password], properties: { username: { type: string, pattern: "^[a-z0-9._-]{3,40}$" }, display_name: { type: string, maxLength: 80 }, role: { type: string, enum: [viewer, officer, admin] }, password: { type: string, minLength: 8 } } } } } }
       responses:
         "200": { description: created, content: { application/json: { schema: { type: object, properties: { user: { $ref: "#/components/schemas/User" } } } } } }
-        "400": { description: validation ({ error }) }
+        "400": { description: "validation failed, with { error }" }
         "409": { description: username exists }
   /api/admin/users/{username}/active:
     parameters: [ { name: username, in: path, required: true, schema: { type: string } } ]
@@ -272,6 +284,7 @@ components:
         contact_number: { type: string }
         id_number: { type: string }
         changed_by_name: { type: string }
+        archived_at: { type: integer, nullable: true, description: "epoch ms when archived; null = active" }
     Record:
       allOf:
         - $ref: "#/components/schemas/Summary"

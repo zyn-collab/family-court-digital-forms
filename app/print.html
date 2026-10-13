@@ -46,8 +46,23 @@
         var forms = [], data = {}, ref = null, blank = false;
 
         // (1) sessionStorage handoff from form.html / admin.html — read AND remove.
+        // (1) handed over by the page that opened this one (form.html, admin.html): no size
+        //     limit, so photos and certificates reach the annex sheets.
         var payload = null;
-        try {
+        if (params.get('handoff') === 'opener') {
+          payload = await new Promise(function (resolve) {
+            var tries = 0;
+            (function poll() {
+              var p = null;
+              try { p = window.opener && window.opener.__fcPrintPayload; } catch (e) { p = null; }
+              if (p) { resolve(JSON.parse(JSON.stringify(p))); return; }
+              if (++tries > 300) { resolve(null); return; }        // about 30 s while attachments load
+              setTimeout(poll, 100);
+            })();
+          });
+          if (!payload) { fail('The form could not be handed to the print page. Close this tab and press print again.'); return; }
+        }
+        if (!payload) try {
           var raw = sessionStorage.getItem('fc_print_payload');
           if (raw) { payload = JSON.parse(raw); sessionStorage.removeItem('fc_print_payload'); }
         } catch (e) { /* private mode / bad JSON */ }

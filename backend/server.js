@@ -100,6 +100,21 @@ function validateData(data) {
       }
       continue;
     }
+    // the wizard's location answers: { applicant_residence: { area, atoll, island }, ... }
+    if (k === 'jurisdiction_answers' && v && typeof v === 'object') {
+      const qs = Object.keys(v);
+      if (qs.length > 10) return 'bad value type: ' + k;
+      for (const q of qs) {
+        const a = v[q];
+        if (!KEY_RE.test(q) || !a || typeof a !== 'object' || Array.isArray(a)) return 'bad value type: ' + k;
+        const parts = Object.keys(a);
+        if (parts.length > 8) return 'bad value type: ' + k;
+        for (const pk of parts) {
+          if (!KEY_RE.test(pk) || !(a[pk] == null || (typeof a[pk] === 'string' && a[pk].length <= 200))) return 'bad value type: ' + k;
+        }
+      }
+      continue;
+    }
     return 'bad value type: ' + k;
   }
   if (data.form_code && !FORM_CODE_RE.test(data.form_code)) return 'bad form_code';
@@ -130,7 +145,11 @@ purgeTimer.unref();
 // 5/min, public status is 20/min. This is per-process, so
 // behind multiple instances put the real limit at the load balancer too. ─────
 const rateBuckets = new Map();                       // key -> [timestamps]
+// FC_RATE_SCALE multiplies every per-address limit: many testers (or a whole office)
+// behind one connection share an address. The per-username login limit is not scaled.
+const RATE_SCALE = Math.max(1, Number(process.env.FC_RATE_SCALE || 1));
 function rateAllow(key, limit, windowMs) {
+  if (key.indexOf('login-user:') !== 0) limit = Math.round(limit * RATE_SCALE);
   const now = Date.now();
   const arr = (rateBuckets.get(key) || []).filter(function (t) { return t > now - windowMs; });
   arr.push(now);
@@ -503,7 +522,7 @@ const server = http.createServer(async function (req, res) {
           return { ref_code: r.ref_code, status: r.status, status_dv: r.status_dv,
                    submitted_at: r.submitted_at, form_code: r.form_code,
                    contact_number: r.contact_number || '', id_number: r.id_number || '',
-                   changed_by_name: lastBy };
+                   changed_by_name: lastBy, archived_at: r.archived_at || null };
         });
         return send(res, 200, { submissions: list });
       }
@@ -553,6 +572,18 @@ const server = http.createServer(async function (req, res) {
       // update status (officer+): THE only path that mutates an existing
       // submission. Attribution is taken from the SESSION, never the request body;
       // the status must be one of STATUSES and its Dhivehi label is derived here.
+      // archive / restore a case (officer+). Nothing is deleted: the case leaves the
+      // default worklist for every officer and returns with "Show archived".
+      if (parts[2] === 'submissions' && parts[3] && parts[4] === 'archive' && parts[5] === undefined && method === 'POST') {
+        if (!auth.requireRole(user, 'officer')) return send(res, 403, { error: 'forbidden' });
+        const ref = decodeURIComponent(parts[3]);
+        const body = await readBody(req);
+        const archived = body.archived !== false;
+        if (!store.setArchived(ref, archived ? Date.now() : null)) return send(res, 404, { error: 'not found' });
+        audit({ action: archived ? 'archive' : 'restore', actor_user_id: user.id, actor_name: user.display_name, ref_code: ref, ip: ip });
+        return send(res, 200, { ok: true, archived: archived });
+      }
+
       if (parts[2] === 'submissions' && parts[3] && parts[4] === 'status' && method === 'POST') {
         if (!auth.requireRole(user, 'officer')) return send(res, 403, { error: 'forbidden' });
         const ref = decodeURIComponent(parts[3]);

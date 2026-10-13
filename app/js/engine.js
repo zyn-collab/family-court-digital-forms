@@ -2724,11 +2724,13 @@ window.FormEngine = (function () {
 
   // Quiet save behind the reference number: on issue and after every completed
   // step. Failures are logged, never shown — the explicit save button reports.
+  let formSubmitted = false;   // from the moment of submission the number belongs to the filing; no more draft saves
+  let autosaveInFlight = Promise.resolve();
   function autosaveDraft() {
-    if (!currentRefCode) return;
+    if (!currentRefCode || formSubmitted) return;
     indexDraft();
     try {
-      Promise.resolve(window.DataStore.saveDraft(currentRefCode, draftPayload()))
+      autosaveInFlight = Promise.resolve(window.DataStore.saveDraft(currentRefCode, draftPayload()))
         .catch(function (e) { console.warn('autosave failed', e); });
     } catch (e) { console.warn('autosave failed', e); }
   }
@@ -2873,6 +2875,10 @@ window.FormEngine = (function () {
     const members = (spec.member_forms && spec.member_forms.length)
       ? spec.member_forms
       : [{ form_code: spec.form_code, ref_prefix: spec.ref_prefix || 'FC' }];
+    // no draft save may arrive after the filing: cancel the pending one, let a running one finish
+    formSubmitted = true;
+    if (typeof autosaveTimer !== 'undefined' && autosaveTimer) clearTimeout(autosaveTimer);
+    await autosaveInFlight;
     try {
       const refCodes = [];
       for (const m of members) {
@@ -2886,6 +2892,7 @@ window.FormEngine = (function () {
         const payload = Object.assign({}, formData);
         payload.form_code = m.form_code;
         payload.ref_code = ref;
+        if (members.length > 1) payload.member_forms = members.map(function (x) { return x.form_code; });   // the record knows its siblings (admin labels, print)
         payload.id_number = formData.applicant_id_number || formData.appellant_id_number || '';
         // dial code + number as one string, the way the SMS gateway will need it
         payload.contact_number = ((formData.sms_phone_cc || '') + ' ' + (formData.sms_phone || formData.applicant_phone || formData.applicant_contact_number || '')).trim();
@@ -2906,6 +2913,7 @@ window.FormEngine = (function () {
       document.getElementById('jurisdictionError').style.display = 'none';
       document.getElementById('successPanel').style.display = 'block';
       document.getElementById('submittedRefCode').textContent = refCodes.join(' · ');
+      formSubmitted = true;
       clearSnapshot();
       refCodes.forEach(unindexDraft);
       // verbatim with the number and email filled in
@@ -2919,6 +2927,7 @@ window.FormEngine = (function () {
       document.getElementById('wizardNav').style.display = 'none';
       document.getElementById('saveResumeBar').style.display = 'none';
     } catch (e) {
+      formSubmitted = false;
       console.error('submit failed', e);
       const why = /quota|storage/i.test(String(e && e.message)) ? 'ހުށަހަޅާ ލިޔުންތައް މި ބްރައުޒަރުގައި ރައްކާކުރެވޭ ވަރަށްވުރެ ބޮޑެވެ.' : 'ކޯޓުގެ ސަރވަރާ ގުޅުމުގައި މައްސަލައެއް ދިމާވިއެވެ.';
       alert('ފޯމު ހުށަހެޅުމުގައި މައްސަލައެއް ދިމާވިއެވެ. ' + why + ' އަލުން މަސައްކަތް ކުރައްވާ.');
@@ -2985,10 +2994,9 @@ window.FormEngine = (function () {
       : [spec.form_code];
     const payload = { forms: forms, data: data };
     if (currentRefCode) payload.ref = currentRefCode;
-    try {
-      sessionStorage.setItem('fc_print_payload', JSON.stringify(payload));
-    } catch (e) { /* quota/private-mode — print.html can still render blank via URL */ }
-    window.open('print.html', '_blank');
+    // handed over directly: attachments make the record larger than session storage holds
+    window.__fcPrintPayload = payload;
+    window.open('print.html?handoff=opener', '_blank');
   }
 
   // ─── Public surface ──────────────────────────────────────────────

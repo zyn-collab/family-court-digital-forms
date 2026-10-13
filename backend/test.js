@@ -175,6 +175,12 @@ function cleanup() { try { fs.rmSync(TMP, { recursive: true, force: true }); } c
     const badShape = await fetch(B + '/api/drafts/' + ref + 'X', { method: 'PUT', headers: jsonHdr,
       body: JSON.stringify({ data: { 'ok_key': { nested: 'object' } } }) });
     check('nested object value rejected on draft PUT (400)', badShape.status === 400, 'status=' + badShape.status);
+    const juris = await fetch(B + '/api/drafts/' + ref + 'J', { method: 'PUT', headers: jsonHdr,
+      body: JSON.stringify({ data: { form_code: 'Fm-C-B15', jurisdiction_answers: { applicant_residence: { area: 'other', atoll: 'K', island: 'ތިލަފުށި' }, respondent_residence: { area: 'male' } } } }) });
+    check('wizard location answers (jurisdiction_answers) accepted in their fixed shape', juris.status === 200, 'status=' + juris.status);
+    const jurisDeep = await fetch(B + '/api/drafts/' + ref + 'K', { method: 'PUT', headers: jsonHdr,
+      body: JSON.stringify({ data: { jurisdiction_answers: { applicant_residence: { area: { deeper: 'x' } } } } }) });
+    check('jurisdiction_answers deeper than its shape rejected (400)', jurisDeep.status === 400, 'status=' + jurisDeep.status);
 
     // 17. health endpoint
     const health = await fetch(B + '/api/health').then(J);
@@ -395,6 +401,19 @@ function cleanup() { try { fs.rmSync(TMP, { recursive: true, force: true }); } c
       check('users: create / password / deactivate audited with the admin as actor',
         ['user_create', 'user_password', 'user_active'].every((a) => uAudit.audit.some((r) => r.action === a && r.actor_name === 'Aminath Admin')));
 
+      const arcV = await fetch(B + '/api/admin/submissions/' + aRef + '/archive', { method: 'POST', headers: viewerH, body: JSON.stringify({ archived: true }) });
+      check('archive: viewer refused (403)', arcV.status === 403, 'status=' + arcV.status);
+      await fetch(B + '/api/admin/submissions/' + aRef + '/archive', { method: 'POST', headers: authH, body: JSON.stringify({ archived: true }) });
+      const arcList = await fetch(B + '/api/admin/submissions', { headers: adminH }).then(J);
+      const arcRow = arcList.submissions.find((r) => r.ref_code === aRef);
+      check('archive: kept on the server, so every officer sees it archived', arcRow && typeof arcRow.archived_at === 'number', JSON.stringify(arcRow && arcRow.archived_at));
+      await fetch(B + '/api/admin/submissions/' + aRef + '/archive', { method: 'POST', headers: authH, body: JSON.stringify({ archived: false }) });
+      const resRow = (await fetch(B + '/api/admin/submissions', { headers: adminH }).then(J)).submissions.find((r) => r.ref_code === aRef);
+      const arcAudit = (await fetch(B + '/api/admin/audit?ref=' + aRef + '&limit=50', { headers: adminH }).then(J)).audit;
+      check('archive: restore clears it; both audited with the officer', resRow && resRow.archived_at === null && arcAudit.some((r) => r.action === 'archive' && r.actor_name === 'Adam Officer') && arcAudit.some((r) => r.action === 'restore'));
+      const arcMissing = await fetch(B + '/api/admin/submissions/NO-SUCHCASE1/archive', { method: 'POST', headers: authH, body: JSON.stringify({ archived: true }) });
+      check('archive: unknown case 404', arcMissing.status === 404, 'status=' + arcMissing.status);
+
       const exp = await fetch(B + '/api/admin/export?since=0&limit=2', { headers: authH }).then(J);
       check('export: full records oldest first, paged with next_since',
         Array.isArray(exp.submissions) && exp.submissions.length === 2 && exp.submissions[0].data && typeof exp.next_since === 'number' && exp.more === true, JSON.stringify({ n: exp.submissions && exp.submissions.length, more: exp.more }));
@@ -557,8 +576,8 @@ function cleanup() { try { fs.rmSync(TMP, { recursive: true, force: true }); } c
     try { m2.init(); } catch (e) { reinitOk = false; err = e.message; }
     const v2 = m2._userVersion();
     const stillThere = !!m2.getSubmission('MIG-1') && !!m2.getUserByUsername('mig');
-    check('migration: second boot does not re-run or error (user_version stable at 2)',
-      reinitOk && v1 === 2 && v2 === 2 && stillThere, 'v1=' + v1 + ' v2=' + v2 + (err ? ' err=' + err : ''));
+    check('migration: second boot does not re-run or error (user_version stable at the latest migration)',
+      reinitOk && v1 === 3 && v2 === 3 && stillThere, 'v1=' + v1 + ' v2=' + v2 + (err ? ' err=' + err : ''));
     m2.close();
 
   } catch (e) {

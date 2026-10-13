@@ -41,6 +41,7 @@ Send the token on every admin call: `Authorization: Bearer <token>`.
 | `POST` | `/api/admin/submissions/:ref/status` | `{ status, note }` | `{ ok: true }` — `status` must be one of submitted/processing/pending/approved/rejected/returned/completed; the Dhivehi label is set by the server; `note` ≤ 500 chars |
 | `GET` | `/api/admin/submissions/:ref/attachments/:filename` | — | the stored file (image/PDF), audited as `attachment_view` |
 | `GET` | `/api/admin/audit?ref=&limit=` | — | `{ audit: [...] }` (officer+) |
+| `POST` | `/api/admin/submissions/:ref/archive` | `{ archived: true\|false }` | `{ ok, archived }` (officer+) — archived cases leave the default worklist for every officer; nothing is deleted; audited as `archive` / `restore`; the list returns `archived_at` |
 | `GET` | `/api/admin/export?since=&limit=` | — | `{ submissions: [full records, oldest first], next_since, more }` (officer+; `limit` ≤ 500; page with `since = next_since`; audited as `export`) |
 | `GET` | `/api/admin/users` | — | `{ users: [{id, username, display_name, role, active, created_at}] }` (admin role) |
 | `POST` | `/api/admin/users` | `{ username, display_name, role, password }` | `{ user }` — username `[a-z0-9._-]{3,40}`, role viewer/officer/admin, password ≥ 8 chars; `409` if taken; audited `user_create` |

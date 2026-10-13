@@ -265,6 +265,8 @@
   <script src="js/site-config.js"></script>
   <script src="specs/specs-bundle.js"></script>
   <script src="js/spec-loader.js"></script>
+  <script src="js/combine-specs.js"></script>
+  <script src="js/lookups.js"></script>
   <script src="js/api-config.js"></script>
   <script src="js/export-csv.js"></script>
   <script>
@@ -524,7 +526,8 @@
       // Overlay the client-local archive markers onto each summary record so the
       // shared recordMatches() filter (which keys off archived_at) works here too.
       var arch = readArchiveMap();
-      all.forEach(function (r) { if (arch[r.ref_code]) r.archived_at = arch[r.ref_code]; });
+      var serverArchive = !!window.DataStore.setArchived;   // the backend keeps the marker for every officer
+      all.forEach(function (r) { if (!serverArchive && arch[r.ref_code]) r.archived_at = arch[r.ref_code]; });
 
       refreshExportOptions(all);   // dropdown lists every form present (incl. archived)
 
@@ -630,22 +633,27 @@
 
   // ─── ARCHIVE / RESTORE (reversible; nothing is ever hard-deleted) ─────
   // These only touch the client-local archive map — no server call.
-  function archiveCase(refCode) {
-    if (!confirm('Archive case ' + refCode + '?\n\nIt will be hidden from the default worklist but is NOT deleted — ' +
-                 'it stays retrievable via "Show archived" and can be restored at any time.\n\n' +
-                 '(Note: archiving here is a per-browser view preference, not stored on the server.)')) return;
-    var map = readArchiveMap();
-    map[refCode] = Date.now();
+  async function setCaseArchived(refCode, archived) {
+    if (window.DataStore.setArchived) {          // backend: shared by every officer, audited
+      await window.DataStore.setArchived(refCode, archived);
+      return;
+    }
+    var map = readArchiveMap();                        // browser-only demonstration mode
+    if (archived) map[refCode] = Date.now(); else delete map[refCode];
     writeArchiveMap(map);
+  }
+  async function archiveCase(refCode) {
+    if (!confirm('Archive case ' + refCode + '?\n\nIt will be hidden from the default worklist for every officer but is NOT deleted. ' +
+                 'It stays retrievable via "Show archived" and can be restored at any time.')) return;
+    try { await setCaseArchived(refCode, true); } catch (e) { if (handleError(e)) return; alert('Archive failed: ' + e.message); }
     loadSubmissions();
   }
 
-  function restoreCase(refCode) {
-    var map = readArchiveMap();
-    delete map[refCode];   // restore = clear the marker
-    writeArchiveMap(map);
+  async function restoreCase(refCode) {
+    try { await setCaseArchived(refCode, false); } catch (e) { if (handleError(e)) return; alert('Restore failed: ' + e.message); }
     loadSubmissions();
   }
+
 
   // MANUAL bulk cleanup. Archives every completed case whose LAST status change
   // (final history entry timestamp — NOT submitted_at) is older than 7 days.
@@ -656,9 +664,8 @@
   async function autoArchiveOld() {
     try {
       var cutoff = Date.now() - AUTO_ARCHIVE_DAYS * 24 * 60 * 60 * 1000;
-      var map = readArchiveMap();
       var candidates = lastSummary.filter(function (s) {
-        return s.status === 'completed' && !map[s.ref_code];
+        return s.status === 'completed' && !s.archived_at;
       });
       var archived = [];
       for (var i = 0; i < candidates.length; i++) {
@@ -669,9 +676,8 @@
         // Key off the LAST status-change timestamp, not submitted_at, so a
         // long-running case is not archived 7 days after it was first submitted.
         var last = hist.length ? hist[hist.length - 1].timestamp : full.submitted_at;
-        if (last != null && last < cutoff) { map[ref] = Date.now(); archived.push(ref); }
+        if (last != null && last < cutoff) { await setCaseArchived(ref, true); archived.push(ref); }
       }
-      if (archived.length) writeArchiveMap(map);
       console.log('auto-archive: archived', archived.length, 'completed case(s):', archived);
       alert(archived.length
         ? 'Archived ' + archived.length + ' completed case(s) whose last status change was more than ' +
@@ -817,6 +823,19 @@
   // Build the detail layout from the form's own spec: every step becomes a
   // section, every field label is the verbatim Dhivehi label from the paper.
   var DISPLAY_ONLY = { notice_block: 1, info_banner: 1, instructions_block: 1 };
+  // A field without a label of its own sits on a page whose title is the question
+  // (or is revealed by an answer): it is named by that answer, else by the page title.
+  function fallbackLabel(step, f) {
+    if (f.options && f.options.length === 1 && f.options[0].label_dv) return f.options[0].label_dv;   // a reveal checkbox
+    var vw = f.visible_when;
+    if (vw && vw.field && (vw.value != null || (vw.values && vw.values.length === 1))) {
+      var want = vw.value != null ? vw.value : vw.values[0];
+      var parent = (step.fields || []).find(function (x) { return x.key === vw.field; });
+      var opt = parent && (parent.options || []).find(function (o) { return o.value === want; });
+      if (opt && opt.label_dv) return String(opt.label_dv).replace(/^[\d.]+\s+/, '');
+    }
+    return step.title_dv || '';
+  }
   // Takes an already-loaded spec (viewDetail loads it once and shares it with
   // buildSpecLabelMap, so the spec is fetched a single time per detail open).
   function buildGroupsFromSpec(spec) {
@@ -837,10 +856,14 @@
           groups.push({ title: 'އިޤްރާރު / ސޮއި / ފޮޓޯ', rows: [
             { key: 'declarant_name', label: step.name_label_dv || 'ނަން' },
             { key: 'declarant_date', label: step.date_label_dv || 'ތާރީޚް' },
-            { key: 'sms_phone', label: 'SMS ނަންބަރު' },
             { key: 'declarant_signature', label: step.sign_label_dv || 'ސޮއި' },
             { key: 'selfie_photo', label: 'ސެލްފީ' },
             { key: 'payment_receipt', label: 'ޕޭމަންޓް ރީސީޓް' }
+          ]});
+          groups.push({ title: 'ނޮޓިފިކޭޝަން', rows: [
+            { key: 'contact_phone', label: 'ފޯނު ނަންބަރު' },
+            { key: 'sms_phone', label: 'SMS ނަންބަރު' },
+            { key: 'notify_email', label: 'އީމެއިލް އެޑްރެސް' }
           ]});
           return;
         }
@@ -867,10 +890,11 @@
             });
             return;
           }
-          rows.push({ key: f.key, label: num + (f.label_dv || (f.options && f.options.length === 1 && f.options[0].label_dv) || f.key) });   // a single-option checkbox is labelled by its option
+          rows.push({ key: f.key, label: num + (f.label_dv || fallbackLabel(step, f) || f.key) });
         });
         if (rows.length) {
-          var title = step.title_dv || step.step_key || '';
+          var first = rows[0] && rows[0].label ? String(rows[0].label).replace(/^[\d.]+\s */, '').replace(/\s*\(.*$/, '').replace(/[:\s]+$/, '') : '';
+          var title = step.title_dv || (first.length > 70 ? first.slice(0, 70) + '…' : first);
           if (step.audience === 'staff_only') title += ' (staff)';
           groups.push({ title: title, rows: rows });
         }
@@ -893,7 +917,7 @@
       (step.fields || []).forEach(function (f) {
         if (f.key && f.label_dv) map[f.key] = f.label_dv.replace(/ފުރިހަމަނަން/g, 'ފުރިހަމަ ނަން').replace(/\s*\(އަތޮޅާއި ރަށާއެކު\)/g, '').replace(/\s+:/g, ':').replace(/([^.])\.\s*$/, '$1');
         // a field whose only text is its single option (a reveal checkbox) is labelled by that option
-        else if (f.key && f.options && f.options.length === 1 && f.options[0].label_dv) map[f.key] = f.options[0].label_dv;
+        else if (f.key && fallbackLabel(step, f)) map[f.key] = fallbackLabel(step, f);
         if (f.type === 'composite_group') {
           (f.subfields || []).forEach(function (s) { if (s.key && s.label_dv) map[s.key] = s.label_dv; });
         }
@@ -901,6 +925,36 @@
     });
     return map;
   }
+
+  // value → Dhivehi wording for every field with options, so an officer reads
+  // "ކައިވެނިކޮށްގެން އުޅޭ މީހެއް", not "married"
+  function buildOptionMap(spec) {
+    var map = {};
+    function add(key, opts, ref) {
+      if ((!opts || !opts.length) && ref && window.FormLookups) opts = window.FormLookups.get(ref);
+      if (!key || !opts || !opts.length) return;
+      map[key] = map[key] || {};
+      opts.forEach(function (o) { if (o && o.value != null) map[key][o.value] = String(o.label_dv || o.value).replace(/^[\d.]+\s+/, ''); });
+    }
+    (spec.steps || []).forEach(function (step) {
+      if (step.type === 'submitting_party') add('submitting_party', (step.options || []).map(function (o) { return { value: o.value, label_dv: o.label_dv }; }));
+      (step.fields || []).forEach(function (f) {
+        add(f.key, f.options, f.options_ref);
+        (f.subfields || []).forEach(function (sf) { add(sf.key, sf.options, sf.options_ref); });
+        (f.columns || []).forEach(function (c) { add(f.key + '__col__' + c.key, c.options, c.options_ref); });
+      });
+    });
+    return map;
+  }
+  function optionText(optionMap, key, v) {
+    var m = optionMap[key];
+    if (!m) return v;
+    if (Array.isArray(v)) return v.map(function (x) { return m[x] != null ? m[x] : x; });
+    return (typeof v === 'string' && m[v] != null) ? m[v] : v;
+  }
+  // parts the form stores beside a field (address parts, dial codes, ID or passport):
+  // shown inside the field's own row, never as rows of their own
+  var PART_SUFFIXES = ['_atoll', '_island', '_detail', '_country', '_city', '_kind', '_cc'];
 
   // dynamic table values are stored flat: <tableKey>_<rowIdx>_<colKey>
   function tableValueRows(f, label, d, used) {
@@ -910,7 +964,7 @@
       (f.table.columns || []).forEach(function (c) {
         var k = f.key + '_' + i + '_' + c.key;
         used[k] = 1;
-        if (d[k] !== undefined && d[k] !== '') parts.push(d[k]);
+        if (d[k] !== undefined && d[k] !== '') parts.push(optionText(f.optionMap || {}, f.key + '__col__' + c.key, d[k]));
       });
       if (parts.length) {
         out.push({ label: label + ' ' + i, html: '<span class="detail-value">' + escHtml(parts.join(' · ')) + '</span>' });
@@ -942,9 +996,12 @@
 
     // Load the spec once; share it with the group builder and the label map.
     var spec = null;
-    try { spec = await SpecLoader.load(formCode); } catch (e) { spec = null; }
+    try {
+      spec = (memberForms.length > 1 && window.CombineSpecs) ? await CombineSpecs.load(memberForms) : await SpecLoader.load(formCode);
+    } catch (e) { spec = null; }
     var groups = spec ? buildGroupsFromSpec(spec) : null;
     var specLabelMap = spec ? buildSpecLabelMap(spec) : {};
+    var optionMap = spec ? buildOptionMap(spec) : {};
     var html = '';
     var used = { form_code: 1, ref_code: 1, id_number: 1, contact_number: 1, contact_email: 1, member_forms: 1, _corrections: 1, jurisdiction_answers: 1 };
 
@@ -953,15 +1010,18 @@
         var rows = [];
         g.rows.forEach(function (r) {
           if (r.table) {
-            var trs = tableValueRows(r, escHtml(r.label), d, used);
+            var trs = tableValueRows(Object.assign({ optionMap: optionMap }, r), escHtml(r.label), d, used);
             used[r.key] = 1;
             rows = rows.concat(trs);
             return;
           }
           used[r.key] = 1;
+          PART_SUFFIXES.forEach(function (sfx) { used[r.key + sfx] = 1; });
           var v = d[r.key];
           if (v === undefined || v === '' || (Array.isArray(v) && !v.length)) return;
-          rows.push({ label: escHtml(r.label), html: fmtValue(r.key, v) });
+          if (typeof v === 'string' && d[r.key + '_cc'] && !/^\+/.test(v)) v = d[r.key + '_cc'] + ' ' + v;   // dial code + number
+          if (d[r.key + '_kind'] === 'passport') v = v + ' (ޕާސްޕޯޓު)';
+          rows.push({ label: escHtml(r.label), html: fmtValue(r.key, optionText(optionMap, r.key, v)) });
         });
         html += renderSection(escHtml(g.title), rows);
       });
@@ -971,7 +1031,9 @@
     var otherRows = [];
     Object.keys(d).forEach(function (key) {
       if (used[key]) return;
-      var v = d[key];
+      if (/^_/.test(key)) return;                                       // engine bookkeeping (_step, …)
+      if (PART_SUFFIXES.some(function (sfx) { return key.length > sfx.length && key.slice(-sfx.length) === sfx && used[key.slice(0, -sfx.length)]; })) return;
+      var v = optionText(optionMap, key, d[key]);
       if (v === undefined || v === '' || (Array.isArray(v) && !v.length)) return;
       // Fallback chain: prefer the spec's verbatim Dhivehi label, then the
       // hardcoded map, then the raw key as a last-resort safety net. Warn on any
@@ -993,9 +1055,13 @@
     }
     // the wizard's four jurisdiction answers, when the form came through the wizard
     if (d.jurisdiction_answers && typeof d.jurisdiction_answers === 'object') {
-      html += renderSection('ސަރަހައްދީ އިޚްތިޞާޞް / Jurisdiction answers', Object.keys(d.jurisdiction_answers).map(function (k) {
+      // the wizard's own question and answer wording (wizard.html, JURIS_QUESTIONS / JURIS_OPTIONS)
+      var JQ = { applicant_permanent: 'މައްސަލަ ހުށަހަޅާ ފަރާތުގެ ދާއިމީ އެޑްރެސް', applicant_current: 'މައްސަލަ ހުށަހަޅާ ފަރާތް، މިހާރު ދިރިއުޅޭ އެޑްރެސް',
+                 respondent_permanent: 'މައްސަލަ ރައްދުވާ ފަރާތުގެ ދާއިމީ އެޑްރެސް', respondent_current: 'މައްސަލަ ރައްދުވާ ފަރާތް، މިހާރު ދިރިއުޅޭ އެޑްރެސް' };
+      var JA = { male: 'މާލެ ސިޓީ', other: 'މާލެ ސިޓީ ފިޔަވައި އެހެން ރަށެއްގައި', abroad: 'ރާއްޖޭން ބޭރުގައި', unknown: 'ނޭނގޭ' };
+      html += renderSection('ސަރަހައްދީ އިޚްތިޞާޞް', Object.keys(d.jurisdiction_answers).map(function (k) {
         var a = d.jurisdiction_answers[k] || {};
-        return { label: escHtml(k), html: '<span class="detail-value">' + escHtml([a.area, a.atoll, a.island].filter(Boolean).join(' / ')) + '</span>' };
+        return { label: escHtml(JQ[k] || k), html: '<span class="detail-value">' + escHtml([JA[a.area] || a.area, a.atoll, a.island].filter(Boolean).join(' / ')) + '</span>' };
       }));
     }
     // Add timeline section. Each entry now shows changed_by_name (the officer who
@@ -1122,15 +1188,25 @@
   // fc_print_payload = { forms: [<code(s)>], data: <record data>, ref: <ref_code> }.
   // `forms` is always an array — a single form is a one-element array; a combined
   // submission lists every member form code.
-  function printRecord() {
+  async function printRecord() {
     if (!currentDetail || !currentDetail.data) { alert('No submission open'); return; }
-    sessionStorage.setItem('fc_print_payload', JSON.stringify({
+    var w = window.open('print.html?handoff=opener', '_blank');   // opened inside the click, so it is not blocked
+    var data = Object.assign({}, currentDetail.data);
+    if (window.DataStore.fetchAttachment) {                   // stored files fetched so the annex sheets show them
+      var keys = Object.keys(data).filter(function (k) { return typeof data[k] === 'string' && /^@file:/.test(data[k]); });
+      await Promise.all(keys.map(function (k) {
+        return window.DataStore.fetchAttachment(currentDetail.ref, data[k].slice(6)).then(function (blob) {
+          return new Promise(function (res) { var fr = new FileReader(); fr.onload = function () { data[k] = fr.result; res(); }; fr.onerror = function () { res(); }; fr.readAsDataURL(blob); });
+        }).catch(function () { /* stays a marker: printed as "in the court record" */ });
+      }));
+    }
+    window.__fcPrintPayload = {
       forms: (currentDetail.forms && currentDetail.forms.length) ? currentDetail.forms : [currentDetail.formCode],
-      data: currentDetail.data,
+      data: data,
       ref: currentDetail.ref
-    }));
-    window.open('print.html', '_blank');
+    };
   }
+
 
   function closeDetail() {
     var m = document.getElementById('detailModal');

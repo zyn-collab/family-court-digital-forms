@@ -174,6 +174,10 @@ status lookup is not. The counters live in the server's memory and reset when it
 restarts, so behind several server instances you should also enforce the real
 limit at the load balancer.
 
+Every per-address limit can be multiplied with `FC_RATE_SCALE` (default 1). Set it,
+for example, to 10 for a testing session where many people share one office connection;
+the per-username login limit is not scaled.
+
 ## Attachments
 
 Uploads arrive inside the submission as data URIs. The server decodes each one,

@@ -11,7 +11,7 @@ and the longer explanations are in `docs/IT_SETUP_GUIDE.md`.
 | Part | Where | State |
 |---|---|---|
 | 17 digital forms (verbatim text, validation, Dhivehi interface, PDF) | `app/` (static files, no build step) | running at the demonstration site; form definitions in `app/specs/` |
-| Backend service, zero dependencies, Node 22.5 or later | `backend/server.js` | 81 automated checks per store (`node test.js`, `FC_STORE=sqlite node test.js`) |
+| Backend service, zero dependencies, Node 22.5 or later | `backend/server.js` | 87 automated checks per store (`node test.js`, `FC_STORE=sqlite node test.js`) |
 | Storage: SQLite (built-in `node:sqlite`, recommended) or JSON files | `backend/store-sqlite.js`, `store-json.js`, `schema.sql`, `migrations/` | both pass the same suite |
 | Reference numbers issued and checked by the server | `POST /api/refs` | unique; a submitted number refuses a new draft |
 | Drafts, submissions, public status by reference number | `/api/drafts`, `/api/submissions` | the status route never returns form data |
@@ -19,7 +19,7 @@ and the longer explanations are in `docs/IT_SETUP_GUIDE.md`.
 | Staff accounts: hashed passwords, roles, sessions, lockout, rate limits | `backend/auth.js`, `user-cli.js`, admin panel | no default password exists |
 | Staff account management in the admin panel | `app/admin.html`, "Staff accounts" (admin role) | list, add, deactivate, activate, set password; all audited |
 | Audit log, append-only | `GET /api/admin/audit` | login, view, status change, attachment view, correction, export, account changes; no route can edit or delete it |
-| Admin panel | `app/admin.html` | list, filter, open a case with Dhivehi labels, view files, change status with a note, archive, CSV export, audit |
+| Admin panel | `app/admin.html` | list, filter, open a case with Dhivehi labels, view files, change status with a note, archive (kept on the server, so every officer shares one worklist), print with attachments, CSV export, audit |
 | Returned-case corrections | `POST /api/submissions/:ref/corrections` | the citizen replaces one document; status returns to processing |
 | Push to the Court's system | `backend/events.js`, `FC_EVENT_WEBHOOK` | every submission, status change and correction POSTed as JSON; all events logged |
 | Pull for the Court's system | `GET /api/admin/export` | full records, oldest first, paged |
@@ -27,6 +27,8 @@ and the longer explanations are in `docs/IT_SETUP_GUIDE.md`.
 | Backups and restore | `backend/backup.js` | database and uploads folder |
 | Container and service files | `backend/Dockerfile`, `docker-compose.yml`, `deploy/nginx.conf`, `deploy/familycourt-forms.service` | whole system on one host |
 | Smoke test against an installation | `backend/smoke.js` | one command walks the whole path |
+| Sample filings for a test installation | `backend/seed-sample.js` | every form, all questions answered, spread over the statuses |
+| Testing guide | `docs/TESTING_GUIDE.md` | setting up a test installation; what public-side and admin-side testers should try; how to report problems |
 
 Not built until the Court supplies the inputs: the SMS and email gateway itself, a one-time passcode on the phone number, eFaas login, a case-register lookup for case numbers, bot protection.
 
@@ -56,6 +58,8 @@ The site is on port 8080 (`deploy/nginx.conf` serves `app/` and proxies `/api/` 
 ## 3. Configuration
 
 Everything is an environment variable; `backend/.env.example` lists every one with a production value. The frontend has exactly one setting, `FC_API_BASE` in `app/js/site-config.js`. With it empty the pages run in demonstration mode (data stays in the browser; the admin page cannot log in). With it set, every page talks to the service. Nothing else in `app/` changes between the two modes.
+
+For a test installation where many testers share one office connection, set `FC_RATE_SCALE=10` (it multiplies the per-connection request limits).
 
 Variables that must change from the defaults: `FC_ALLOW_ORIGIN`, `FC_STORE=sqlite`, `FC_DB_PATH`, `FC_UPLOADS_DIR`, `FC_TRUST_PROXY=1` behind a proxy, `FC_PUBLIC_SITE`.
 

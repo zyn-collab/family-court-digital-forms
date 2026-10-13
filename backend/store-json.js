@@ -117,7 +117,9 @@ function createStore(opts) {
 
     // ── submissions ─────────────────────────────────────────────────────────
     getSubmission(ref) {
-      return submissions[ref] || null;                 // full record incl. history[]
+      const rec = submissions[ref] || null;            // full record incl. history[]
+      if (rec && !('archived_at' in rec)) rec.archived_at = null;   // same field set as the SQLite store
+      return rec;
     },
     putSubmission(ref, record) {
       submissions[ref] = record;
@@ -125,7 +127,15 @@ function createStore(opts) {
     },
     listSubmissions() {
       // The array the admin list route builds its response from (full records).
-      return Object.keys(submissions).map(function (k) { return submissions[k]; });
+      return Object.keys(submissions).map(function (k) { const r = submissions[k]; if (!('archived_at' in r)) r.archived_at = null; return r; });
+    },
+    // archive marker: an epoch-ms timestamp, or null to restore. Returns false if the case is unknown.
+    setArchived(ref, ts) {
+      const rec = submissions[ref];
+      if (!rec) return false;
+      rec.archived_at = ts == null ? null : ts;
+      saveFile(subsFile, submissions);
+      return true;
     },
     updateStatus(ref, status, statusDv, entry) {
       const rec = submissions[ref];
