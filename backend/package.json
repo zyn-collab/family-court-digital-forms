@@ -1,0 +1,14 @@
+{
+  "name": "family-court-forms-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reference backend for the Family Court digital forms (zero runtime dependencies).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  }
+}

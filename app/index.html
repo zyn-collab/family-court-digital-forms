@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="dv" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ފެމިލީ ކޯޓު — ޑިޖިޓަލް ފޯމުތައް</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/rtl.css">
+  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="css/widgets.css">
+  <style>
+    body { background: #f7f4f6; }
+    .home-wrap { max-width: 880px; margin: 0 auto; padding: 12px 18px 48px; }
+
+    /* PRIMARY path — the wizard: a light, open, welcoming section */
+    .hero { background: linear-gradient(170deg, #fbeef4 0%, #f7f4f6 78%); border-radius: 24px;
+      padding: 52px 40px 46px; margin: 24px 0 24px; text-align: center; }
+    .hero .badge { display: inline-block; background: #fff; color: var(--color-primary);
+      border: 1px solid #f0dce7; padding: 6px 18px; border-radius: 999px; font-size: 0.85rem;
+      font-weight: 600; margin-bottom: 20px; }
+    .hero h2 { color: var(--color-primary-dark); margin: 0 0 16px; font-size: 2.1rem;
+      line-height: 1.75; font-weight: 800; }
+    .hero p { margin: 0 auto 30px; max-width: 600px; color: #6a5560; font-size: 1.12rem; line-height: 2; }
+    .hero-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--color-primary);
+      color: #fff; font-weight: 700; border: none; padding: 17px 48px; border-radius: 14px;
+      font-size: 1.6rem; text-decoration: none; box-shadow: 0 8px 22px rgba(109,26,65,0.30);
+      transition: transform .12s, box-shadow .12s; }
+    .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(109,26,65,0.40); }
+
+    /* status / resume */
+    .drafts-box { background: #fff; border-radius: 12px; padding: 14px 18px; margin: 0 0 14px; box-shadow: 0 2px 10px rgba(109,26,65,0.06); }
+    .drafts-box .lbl { font-size: 0.92rem; font-weight: 600; display: block; margin-bottom: 8px; }
+    .drafts-box ul { list-style: none; margin: 0; padding: 0; }
+    .drafts-box li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 0; border-top: 1px solid #f0e6ea; }
+    .drafts-box li:first-child { border-top: 0; }
+    .drafts-box .d-title { flex: 1; min-width: 200px; font-weight: 600; }
+    .drafts-box .d-ref { font-family: monospace; direction: ltr; letter-spacing: 1px; color: #6d1a41; }
+    .drafts-box .d-when { font-size: 0.8rem; color: #8a7a82; direction: ltr; }
+    .drafts-box .d-go { background: var(--color-primary, #6d1a41); color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: 0.88rem; }
+    .drafts-box .d-drop { background: none; border: 1px solid #e5d8de; border-radius: 8px; padding: 5px 10px; cursor: pointer; font-size: 0.82rem; color: #8a7a82; font-family: inherit; }
+    .status-box { display: flex; gap: 10px; align-items: center; background: #fff; border-radius: 12px;
+      padding: 14px 18px; margin-bottom: 14px; border: 1px solid var(--color-border); flex-wrap: wrap; }
+    .status-box .lbl { font-size: 0.92rem; font-weight: 600; flex: 1; min-width: 220px; }
+    .status-box input { direction: ltr; text-align: center; font-family: monospace; letter-spacing: 1px;
+      border: 1.5px solid var(--color-border); border-radius: 8px; padding: 9px 12px; width: 170px; font-size: 0.95rem; }
+
+    /* FALLBACK path — full form list, collapsed by default */
+    .browse-toggle { width: 100%; text-align: right; background: #fff; border: 1px solid var(--color-border);
+      border-radius: 12px; padding: 15px 20px; font-family: inherit; font-size: 1rem; font-weight: 600;
+      color: var(--color-text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .browse-toggle:hover { border-color: var(--color-primary); }
+    .browse-toggle .hint { font-weight: 400; font-size: 0.82rem; color: var(--color-text-secondary); }
+    .browse-toggle .chev { transition: transform .2s; color: var(--color-primary); }
+    .browse-toggle.open .chev { transform: rotate(180deg); }
+    #browsePanel { display: none; margin-top: 14px; }
+    #browsePanel.open { display: block; }
+
+    .cat { margin: 22px 0 10px; display: flex; align-items: center; gap: 10px; }
+    .cat .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+    .cat h3 { margin: 0; font-size: 1.02rem; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 12px; }
+    .fcard { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--color-border);
+      border-right: 4px solid var(--cat, #6d1a41); border-radius: 14px; padding: 15px 18px 12px;
+      transition: box-shadow .12s, border-color .12s; }
+    .fcard:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.07); }
+    .fcard .title { font-size: 1rem; font-weight: 700; line-height: 1.85; }
+    .fcard .sub { direction: ltr; text-align: left; color: var(--color-text-secondary); font-size: 0.76rem; margin-top: 4px; }
+    .fcard .actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--color-border); }
+    .fcard .fill { flex: 1; text-align: center; background: var(--cat, #6d1a41); color: #fff; text-decoration: none;
+      padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; }
+    .fcard .fill:hover { filter: brightness(1.08); }
+    .fcard .pdf { text-align: center; background: #f4eef1; color: var(--cat, #6d1a41); text-decoration: none;
+      padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; direction: ltr; }
+    .fcard .pdf:hover { background: #ece0e6; }
+
+    .home-note { font-size: 0.8rem; color: #a89ea6; margin-top: 30px; text-align: center; }
+    .tools-row { margin-top: 26px; text-align: center; font-size: 0.82rem; }
+    .tools-row a { color: #9a8a94; }
+  </style>
+</head>
+<body>
+
+  <div class="home-wrap">
+
+    <!-- PRIMARY: the wizard -->
+    <!-- heading "ފޯމު ފުރުމަށް!", no pill, no intro text,
+         button "ފަށާ!" in a bigger font with no arrow -->
+    <section class="hero">
+      <h2><span class="dv">ފޯމު ފުރުމަށް!</span></h2>
+      <a class="hero-btn" href="wizard.html">
+        <span class="dv">ފަށާ!</span>
+      </a>
+    </section>
+
+    <!-- "a list of uncompleted local storage forms visible at the very start" -->
+    <div class="drafts-box no-print" id="draftsBox" hidden>
+      <span class="lbl"><span class="dv">ފުރިހަމަނުކުރައްވާ ފޯމުތައް:</span></span>
+      <ul id="draftsList"></ul>
+    </div>
+
+    <!-- status / resume -->
+    <div class="status-box no-print">
+      <span class="lbl"><span class="dv">ހުށަހެޅި ފޯމެއްގެ ސްޓެޓަސް ބެއްލެވުމަށް، ނުވަތަ ސޭވްކުރި ފޯމެއް ކުރިއަށް ގެންދިއުމަށް:</span></span>
+      <input id="refInput" placeholder="VS-XXXXXXXX" maxlength="14">
+      <button class="btn btn-secondary" onclick="checkRef()"><span class="dv">ބައްލަވާ</span></button>
+    </div>
+
+  </div>
+
+
+  <script src="specs/specs-bundle.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/spec-loader.js"></script>
+  <script src="js/form-index.js"></script>
+  <script>
+  function checkRef() {
+    var v = document.getElementById('refInput').value.trim();
+    if (v) window.location.href = 'status.html?ref=' + encodeURIComponent(v.toUpperCase());
+  }
+  // unfinished forms saved on this device (the reference-number drafts the
+  // form writes on every change), newest first; each opens its form at the draft.
+  function renderDrafts() {
+    var box = document.getElementById('draftsBox'), ul = document.getElementById('draftsList');
+    var idx = {};
+    try { idx = JSON.parse(localStorage.getItem('fc_draft_index') || '{}'); } catch (e) { idx = {}; }
+    var refs = Object.keys(idx).sort(function (a, b) { return (idx[b].saved_at || 0) - (idx[a].saved_at || 0); });
+    if (!refs.length) { box.hidden = true; return; }
+    ul.innerHTML = refs.map(function (ref) {
+      var d = idx[ref];
+      var href = (d.forms && d.forms.length > 1 ? 'form.html?forms=' + encodeURIComponent(d.forms.join(',')) : 'form.html?form=' + encodeURIComponent(d.form_code)) + '&resume=' + encodeURIComponent(ref);
+      var when = d.saved_at ? new Date(d.saved_at).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      var prog = (typeof d.step === 'number' && d.steps) ? ' (' + (d.step + 1) + '/' + d.steps + ')' : '';
+      return '<li><span class="d-title dv">' + esc(d.title_dv || d.form_code) + prog + '</span>' +
+        '<span class="d-ref">' + esc(ref) + '</span><span class="d-when">' + esc(when) + '</span>' +
+        '<a class="d-go" href="' + href + '"><span class="dv">ކުރިއަށް ގެންދަވާ</span></a>' +
+        '<button type="button" class="d-drop" data-ref="' + esc(ref) + '"><span class="dv">ފޮހެލާ</span></button></li>';
+    }).join('');
+    box.hidden = false;
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('refInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') checkRef();
+    });
+    renderDrafts();
+    document.getElementById('draftsList').addEventListener('click', function (e) {
+      var b = e.target.closest('.d-drop'); if (!b) return;
+      if (!window.confirm('މި ފޯމު ލިސްޓުން ފޮހެލައްވަންތޯ؟')) return;
+      try { var idx = JSON.parse(localStorage.getItem('fc_draft_index') || '{}'); delete idx[b.dataset.ref]; localStorage.setItem('fc_draft_index', JSON.stringify(idx)); } catch (err) { /* ignore */ }
+      renderDrafts();
+    });
+  });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — Family Court</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="css/widgets.css">
+  <style>
+    body { direction: ltr; font-family: var(--font-en); }
+    .admin-container { max-width: 900px; margin: 0 auto; padding: 28px 20px; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .admin-header h1 { font-size: 1.4rem; color: var(--color-primary-dark); }
+    .submissions-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .submissions-table th { background: var(--color-primary); color: white; padding: 12px 14px; text-align: left; font-weight: 600; }
+    .submissions-table td { padding: 10px 14px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+    .submissions-table tr:hover { background: var(--color-primary-light); }
+    .status-select { padding: 6px 10px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); font-size: 0.85rem; }
+    .status-select:focus { outline: none; border-color: var(--color-primary); }
+    .note-input { padding: 6px 10px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); font-size: 0.85rem; width: 100%; }
+    .btn-update { padding: 6px 14px; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.82rem; font-weight: 600; }
+    .btn-update:hover { background: var(--color-primary-dark); }
+    .update-msg { color: var(--color-success); font-size: 0.82rem; display: none; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--color-text-secondary); }
+    .badge { display: inline-block; padding: 3px 12px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; color: white; }
+    .admin-nav { margin-bottom: 20px; }
+    .admin-nav a { color: var(--color-primary); text-decoration: none; font-size: 0.88rem; }
+    .admin-nav a:hover { text-decoration: underline; }
+    .btn-view { padding: 6px 14px; background: #fff; color: var(--color-primary); border: 1.5px solid var(--color-primary); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.82rem; font-weight: 600; margin-right: 6px; }
+    .btn-view:hover { background: var(--color-primary-light); }
+
+    /* Detail modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9000; display: none; align-items: flex-start; justify-content: center; padding: 28px; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal-card { background: #fff; max-width: 820px; width: 100%; border-radius: var(--radius-md); box-shadow: 0 12px 40px rgba(0,0,0,0.3); overflow: hidden; }
+    .modal-head { background: var(--color-primary); color: #fff; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-head h2 { font-size: 1.05rem; margin: 0; font-family: var(--font-en); }
+    .modal-close { background: transparent; border: 1px solid #fff; color: #fff; padding: 4px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; }
+    .modal-close:hover { background: rgba(255,255,255,0.15); }
+    .modal-body { padding: 20px 22px; max-height: 78vh; overflow-y: auto; direction: rtl; }
+    .detail-section { margin-bottom: 18px; border: 1px solid #e0e0e0; border-radius: var(--radius-sm); overflow: hidden; }
+    .detail-section h3 { font-size: 0.95rem; background: #f3f3f3; padding: 8px 12px; margin: 0; border-bottom: 1px solid #e0e0e0; }
+    .detail-row { display: flex; border-bottom: 1px solid #f0f0f0; font-size: 0.86rem; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { padding: 6px 10px; color: #666; min-width: 180px; background: #fafafa; border-left: 1px solid #f0f0f0; flex-shrink: 0; }
+    .detail-value { padding: 6px 10px; flex: 1; word-break: break-word; }
+    .detail-value.empty { color: #aaa; font-style: italic; }
+    .detail-img { max-width: 200px; max-height: 160px; border: 1px solid #ddd; border-radius: 4px; display: block; margin-top: 4px; }
+    .detail-sig { max-width: 240px; max-height: 80px; border: 1px solid #ddd; border-radius: 4px; background: #fff; display: block; margin-top: 4px; }
+
+    /* Filter bar + archive controls */
+    .filter-bar { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px; }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group > .filter-label { font-size: 0.7rem; color: var(--color-text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+    .filter-bar input[type=date], .filter-bar select { padding: 6px 8px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); font-size: 0.82rem; font-family: var(--font-en); }
+    .status-filter-box { display: flex; gap: 8px; flex-wrap: wrap; max-width: 340px; }
+    .status-filter-box label { display: inline-flex; align-items: center; gap: 3px; font-size: 0.78rem; }
+    .btn-archive, .btn-restore { padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-weight: 600; border: 1.5px solid; background: #fff; }
+    .btn-archive { color: #b45309; border-color: #f59e0b; }
+    .btn-archive:hover { background: #fff7ed; }
+    .btn-restore { color: #047857; border-color: #10b981; }
+    .btn-restore:hover { background: #ecfdf5; }
+    .btn-autoarchive { padding: 7px 14px; background: var(--color-primary); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; text-align: center; line-height: 1.35; }
+    .btn-autoarchive:hover { background: var(--color-primary-dark); }
+    .btn-autoarchive .dv { font-family: var(--font-dv, 'Faruma'), sans-serif; }
+    .row-archived { opacity: 0.55; background: #fafafa; }
+    .row-archived:hover { opacity: 0.85; }
+    .arch-tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 10px; font-size: 0.66rem; font-weight: 700; background: #6b7280; color: #fff; vertical-align: middle; }
+
+    /* Login view (production admin only — the demo page has no login) */
+    .login-view { max-width: 380px; margin: 60px auto; padding: 0 20px; }
+    .login-card { background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 26px 24px; box-shadow: 0 4px 18px rgba(0,0,0,0.08); }
+    .login-card h2 { font-family: var(--font-dv), 'Faruma', sans-serif; font-size: 1.15rem; color: var(--color-primary-dark); margin: 0 0 4px; text-align: center; }
+    .login-card .login-sub { font-family: var(--font-en); font-size: 0.78rem; color: var(--color-text-secondary); text-align: center; margin: 0 0 18px; }
+    .login-field { display: block; margin-bottom: 14px; }
+    .login-field .lbl-dv { display: block; font-family: var(--font-dv), 'Faruma', sans-serif; font-size: 0.9rem; margin-bottom: 4px; }
+    .login-field .lbl-en { font-family: var(--font-en); color: #999; font-size: 0.72rem; }
+    .login-field input { width: 100%; padding: 9px 11px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); font-family: var(--font-en); font-size: 0.9rem; }
+    .login-field input:focus { outline: none; border-color: var(--color-primary); }
+    .login-error { display: none; color: #ef4444; font-family: var(--font-dv), 'Faruma', sans-serif; font-size: 0.85rem; margin-bottom: 12px; text-align: center; }
+    .btn-login { width: 100%; padding: 11px; background: var(--color-primary); color: #fff; border: none; border-radius: var(--radius-sm); font-family: var(--font-dv), 'Faruma', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    .btn-login:hover { background: var(--color-primary-dark); }
+    .admin-identity { display: none; align-items: center; gap: 10px; }
+    .admin-identity .who { font-family: var(--font-dv), 'Faruma', sans-serif; font-size: 0.85rem; }
+    /* No-permission / role notes (viewer role) */
+    .no-perm { color: #b45309; font-family: var(--font-dv), 'Faruma', sans-serif; font-size: 0.82rem; }
+  </style>
+</head>
+<body>
+
+  <header class="court-header">
+    <div class="header-content" style="max-width:900px;">
+      <div class="court-info">
+        <h1 class="court-name" style="font-family:var(--font-en)">Family Court — Admin Panel</h1>
+        <p class="country-name">Digital Forms</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── LOGIN VIEW (shown whenever no staff session is active) ────────────────
+       Production admin requires a per-staff login (spec 02). Identity for every
+       mutation is derived server-side from the session; this page never sends a
+       name/user field. -->
+  <div class="login-view" id="loginView" style="display:none;">
+    <div class="login-card" dir="rtl">
+      <h2>ސްޓާފް ލޮގިން</h2>
+      <p class="login-sub">Staff login</p>
+      <form onsubmit="return doLogin(event)">
+        <label class="login-field">
+          <span class="lbl-dv">ޔޫޒަރނޭމް <span class="lbl-en">(Username)</span></span>
+          <input id="loginUsername" type="text" autocomplete="username" dir="ltr">
+        </label>
+        <label class="login-field">
+          <span class="lbl-dv">ޕާސްވޯޑް <span class="lbl-en">(Password)</span></span>
+          <input id="loginPassword" type="password" autocomplete="current-password" dir="ltr">
+        </label>
+        <div class="login-error" id="loginError"></div>
+        <button type="submit" class="btn-login">ލޮގިން</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── APP VIEW (shown only when logged in) ─────────────────────────────── -->
+  <div id="appView" style="display:none;">
+  <div class="admin-container">
+    <div class="admin-nav" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div>
+        <a href="index.html">← Back to Form</a> &nbsp;|&nbsp;
+        <a href="status.html">Status Lookup</a>
+      </div>
+      <!-- Logged-in identity: display_name (from the session) + logout. -->
+      <div class="admin-identity" id="adminIdentity">
+        <span class="who" dir="rtl"><span id="adminName"></span></span>
+        <button type="button" class="btn btn-secondary" onclick="doLogout()" style="font-family:var(--font-dv),'Faruma',sans-serif;font-size:0.82rem;">ލޮގްއައުޓް</button>
+      </div>
+    </div>
+
+    <div class="admin-header">
+      <h1>Submissions</h1>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button type="button" class="btn btn-secondary" onclick="exportSelectedForm()" style="font-family:var(--font-en);">
+          Export CSV
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="exportAllFiltered()" style="font-family:var(--font-en);">
+          Export All
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="loadSubmissions()" style="font-family:var(--font-en);">
+          Refresh
+        </button>
+        <button type="button" class="btn btn-secondary" id="staffBtn" onclick="toggleStaff()" style="font-family:var(--font-en);display:none;">
+          Staff accounts
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter bar: form / status (multi) / submitted-date range / show-archived.
+         Filters apply to the visible list AND to CSV export. -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">Form</span>
+        <select id="exportFormSelect" onchange="loadSubmissions()" style="max-width:220px;">
+          <option value="">All forms</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status</span>
+        <div class="status-filter-box" id="statusFilters"></div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Submitted from</span>
+        <input type="date" id="filterFrom" onchange="loadSubmissions()">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Submitted to</span>
+        <input type="date" id="filterTo" onchange="loadSubmissions()">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Archived</span>
+        <label style="display:inline-flex;align-items:center;gap:5px;font-size:0.82rem;height:32px;">
+          <input type="checkbox" id="filterArchived" onchange="loadSubmissions()"> Show archived
+        </label>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">&nbsp;</span>
+        <button type="button" class="btn btn-secondary" onclick="clearFilters()" style="font-family:var(--font-en);">Clear filters</button>
+      </div>
+      <div class="filter-group" style="margin-left:auto;">
+        <span class="filter-label">Cleanup</span>
+        <!-- MANUAL cleanup only. This button NEVER runs on page load — cases can
+             never vanish without a staff click. -->
+        <button type="button" class="btn-autoarchive" onclick="autoArchiveOld()"
+          title="Archive every completed case whose last status change was more than 7 days ago. Runs only when you click it — nothing is archived automatically.">
+          <span class="dv" dir="rtl">7 ދުވަހަށްވުރެ ގިނަ ދުވަސްވީ ނިމިފައި މައްސަލަތައް އަރުޝީފުކުރައްވާ</span>
+          <span style="display:block;font-size:0.7rem;opacity:0.85;font-family:var(--font-en);">Archive completed &gt; 7 days old</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="staffPanel" style="display:none;background:#fff;border:1px solid #e3d6dc;border-radius:10px;padding:16px 18px;margin:0 0 16px;font-family:var(--font-en);">
+      <h2 style="font-size:1.05rem;margin:0 0 8px;">Staff accounts</h2>
+      <p style="font-size:0.85rem;color:#666;margin:0 0 12px;">Roles: viewer reads cases; officer also changes status and reads the audit log; admin also manages accounts. A deactivated account cannot log in and its open sessions end. Setting a password ends that account's open sessions.</p>
+      <table style="width:100%;font-size:0.9rem;border-collapse:collapse;">
+        <thead><tr><th style="text-align:left;padding:6px 4px;border-bottom:1px solid #e3d6dc;">Username</th><th style="text-align:left;padding:6px 4px;border-bottom:1px solid #e3d6dc;">Name</th><th style="text-align:left;padding:6px 4px;border-bottom:1px solid #e3d6dc;">Role</th><th style="text-align:left;padding:6px 4px;border-bottom:1px solid #e3d6dc;">State</th><th style="border-bottom:1px solid #e3d6dc;"></th></tr></thead>
+        <tbody id="staffRows"></tbody>
+      </table>
+      <form id="staffAddForm" onsubmit="return addStaff(event)" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:14px;font-size:0.85rem;">
+        <label>Username<br><input id="staffUser" required pattern="[A-Za-z0-9._-]{3,40}" title="3 to 40 letters, digits, . _ -" style="min-width:140px;"></label>
+        <label>Display name<br><input id="staffName" required maxlength="80" style="min-width:180px;"></label>
+        <label>Role<br><select id="staffRole"><option value="viewer">viewer</option><option value="officer" selected>officer</option><option value="admin">admin</option></select></label>
+        <label>Password (8 or more characters)<br><input id="staffPass" type="password" required minlength="8" autocomplete="new-password" style="min-width:160px;"></label>
+        <button type="submit" class="btn btn-primary" style="font-family:var(--font-en);">Add account</button>
+        <span id="staffMsg" style="font-size:0.85rem;"></span>
+      </form>
+    </div>
+
+    <div id="tableWrapper">
+      <div class="empty-state" id="emptyState">
+        <p style="font-size:1.1rem;margin-bottom:8px;">No submissions yet</p>
+        <p>Submissions will appear here once forms are submitted.</p>
+      </div>
+
+      <table class="submissions-table" id="submissionsTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Ref Code</th>
+            <th>Form</th>
+            <th>ID Number</th>
+            <th>Phone</th>
+            <th>Submitted</th>
+            <th>Current Status</th>
+            <th>Last changed by</th>
+            <th>Update Status</th>
+          </tr>
+        </thead>
+        <tbody id="submissionsBody"></tbody>
+      </table>
+    </div>
+  </div>
+  </div><!-- /appView -->
+
+  <footer class="court-footer">
+    <p>Admin Panel</p>
+  </footer>
+
+  <!-- Detail modal -->
+  <div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeDetail()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="detailTitle">Submission Detail</h2>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="btn btn-secondary" id="printRecordBtn" onclick="printRecord()"
+            style="font-family:var(--font-en);font-size:0.85rem;">Print / PDF</button>
+          <button type="button" class="btn btn-secondary" id="dlAttachmentsBtn" onclick="downloadAttachments()"
+            style="font-family:var(--font-en);font-size:0.85rem;">Download attachments</button>
+          <button type="button" class="modal-close" onclick="closeDetail()">Close</button>
+        </div>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+    </div>
+  </div>
+
+  <!-- API base URL: deployers edit this ONE line to point at the Court's backend.
+       Default matches api-config.js's own default (http://localhost:4000). -->
+  <script src="js/site-config.js"></script>
+  <script src="specs/specs-bundle.js"></script>
+  <script src="js/spec-loader.js"></script>
+  <script src="js/api-config.js"></script>
+  <script src="js/export-csv.js"></script>
+  <script>
+  // ── session views: login vs. app. Any 'unauthorized' thrown by the adapter
+  // (expired/deactivated session) drops us back here via handleError(). ────────
+  function showApp() {
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('appView').style.display = '';
+    document.getElementById('adminName').textContent = window.DataStore.adminName() || '';
+    document.getElementById('staffBtn').style.display = window.DataStore.adminRole() === 'admin' ? '' : 'none';
+    document.getElementById('adminIdentity').style.display = 'flex';
+    renderStatusFilters();
+    loadSubmissions();
+    // NOTE: auto-archive is intentionally NOT invoked on load. Completed cases are
+    // archived only when staff click the cleanup button, so a case can never
+    // vanish from the worklist without an explicit action.
+  }
+
+  function showLogin(msg) {
+    document.getElementById('appView').style.display = 'none';
+    document.getElementById('adminIdentity').style.display = 'none';
+    closeDetail();
+    document.getElementById('loginView').style.display = '';
+    var el = document.getElementById('loginError');
+    if (msg) { el.textContent = msg; el.style.display = 'block'; }
+    else { el.textContent = ''; el.style.display = 'none'; }
+    var p = document.getElementById('loginPassword'); if (p) p.value = '';
+  }
+
+  // Shared handler for a dead session. Any adapter call that throws
+  // 'unauthorized' (the adapter already cleared the token) routes through here,
+  // so there is ONE place that returns the UI to the login view — no per-callsite
+  // copy-paste. Returns true if it handled the error.
+  function handleError(e) {
+    if (e && e.message === 'unauthorized') {
+      showLogin('ސެޝަން ހަމަވެއްޖެ. އަލުން ލޮގިން ވެލައްވާ.');
+      return true;
+    }
+    return false;
+  }
+
+  async function doLogin(ev) {
+    if (ev) ev.preventDefault();
+    var u = (document.getElementById('loginUsername').value || '').trim();
+    var p = document.getElementById('loginPassword').value || '';
+    var errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    if (!u || !p) {
+      errEl.textContent = 'ޔޫޒަރނޭމް އަދި ޕާސްވޯޑް ދެއްވާ';
+      errEl.style.display = 'block';
+      return false;
+    }
+    try {
+      var ok = await window.DataStore.adminLogin(u, p);
+      if (ok) { showApp(); }
+      else {
+        errEl.textContent = 'ލޮގިން ވުމުގައި މައްސަލައެއް ދިމާވެއްޖެ';
+        errEl.style.display = 'block';
+      }
+    } catch (e) {
+      // On the login endpoint a 401 ('unauthorized') means wrong username/password
+      // (NOT an expired session), so it is handled here, not via handleError().
+      if (e && e.message === 'rate limited') {
+        errEl.textContent = 'ގިނަ ފަހަރު މަސައްކަތް ކުރައްވައިފި. މިނެޓެއްހާއިރު މަޑުކުރައްވާފައި އަލުން މަސައްކަތް ކުރައްވާ.';
+      } else {
+        errEl.textContent = 'ޔޫޒަރނޭމް ނުވަތަ ޕާސްވޯޑް ރަނގަޅެއް ނޫން';
+      }
+      errEl.style.display = 'block';
+      document.getElementById('loginPassword').value = '';
+    }
+    return false;
+  }
+
+  async function doLogout() {
+    try { await window.DataStore.adminLogout(); } catch (e) { /* ignore */ }
+    showLogin('');
+  }
+
+  function refreshExportOptions(subs) {
+    var sel = document.getElementById('exportFormSelect');
+    if (!sel) return;
+    var codes = {};
+    (subs || []).forEach(function (s) { codes[s.form_code || 'Fm-C-B20'] = 1; });
+    var current = sel.value;
+    sel.innerHTML = '<option value="">All forms</option>' +
+      Object.keys(codes).sort().map(function (c) {
+        return '<option value="' + escHtml(c) + '">' + escHtml(c) + '</option>';
+      }).join('');
+    sel.value = current;
+  }
+
+  // Read the current filter-bar state. Shared by list rendering and by export so
+  // the visible list and the exported CSV always describe the same slice.
+  //   form (string|null), statuses (array), from/to (ms|null), includeArchived (bool)
+  function currentFilterOpts() {
+    var form = (document.getElementById('exportFormSelect') || {}).value || '';
+    var statuses = Array.prototype.slice
+      .call(document.querySelectorAll('.status-filter:checked'))
+      .map(function (c) { return c.value; });
+    var fromStr = (document.getElementById('filterFrom') || {}).value || '';
+    var toStr = (document.getElementById('filterTo') || {}).value || '';
+    var from = fromStr ? new Date(fromStr + 'T00:00:00').getTime() : null;
+    var to = toStr ? new Date(toStr + 'T23:59:59.999').getTime() : null;
+    var includeArchived = !!(document.getElementById('filterArchived') || {}).checked;
+    return { form: form || null, statuses: statuses, from: from, to: to, includeArchived: includeArchived };
+  }
+
+  // Export honors the same filters, minus 'form' (each export fixes its own form).
+  function exportFilterOpts() {
+    var o = currentFilterOpts();
+    return { statuses: o.statuses, from: o.from, to: o.to, includeArchived: o.includeArchived };
+  }
+
+  // CSV export: ExportCSV reads the demo localStorage store ('fc_demo_submissions')
+  // directly, but this page's data lives on the backend. So we HYDRATE that store
+  // with full records fetched from the API just for the export, run the identical
+  // ExportCSV code path, then RESTORE whatever was there before — the store is
+  // shared with admin.html on the same origin, so it must be left untouched.
+  async function hydrateForExport(refs) {
+    var map = {};
+    var arch = readArchiveMap();
+    for (var i = 0; i < refs.length; i++) {
+      var full = await window.DataStore.getSubmissionFull(refs[i]);
+      if (!full) continue;
+      var rec = {
+        data: full.data || {},
+        status: full.status, status_dv: full.status_dv,
+        submitted_at: full.submitted_at,
+        contact_number: full.contact_number || '',
+        id_number: full.id_number || '',
+        form_code: full.form_code || 'Fm-C-B20',
+        history: full.history || []
+      };
+      if (arch[refs[i]]) rec.archived_at = arch[refs[i]];   // client-local archive marker
+      map[refs[i]] = rec;
+    }
+    return map;
+  }
+
+  async function withHydrated(refs, fn) {
+    var map;
+    try { map = await hydrateForExport(refs); }
+    catch (e) { if (!handleError(e)) alert('Export failed: ' + e.message); return; }
+    var saved = localStorage.getItem('fc_demo_submissions');
+    try {
+      localStorage.setItem('fc_demo_submissions', JSON.stringify(map));
+      await fn();
+    } finally {
+      // Always restore — never clobber the demo page's store on this origin.
+      if (saved === null) localStorage.removeItem('fc_demo_submissions');
+      else localStorage.setItem('fc_demo_submissions', saved);
+    }
+  }
+
+  async function exportSelectedForm() {
+    var code = document.getElementById('exportFormSelect').value;
+    if (!code) { alert('Pick a form in the Form filter to export one form, or use "Export All".'); return; }
+    var refs = lastSummary
+      .filter(function (s) { return (s.form_code || 'Fm-C-B20') === code; })
+      .map(function (s) { return s.ref_code; });
+    await withHydrated(refs, async function () {
+      var opts = exportFilterOpts();
+      var n = await ExportCSV.exportForm(code, opts);
+      console.log('exported', n, 'rows for', code, 'with filters', opts);
+    });
+  }
+
+  async function exportAllFiltered() {
+    var refs = lastSummary.map(function (s) { return s.ref_code; });
+    await withHydrated(refs, async function () {
+      await ExportCSV.exportAll(exportFilterOpts());
+    });
+  }
+
+  function clearFilters() {
+    var f = document.getElementById('exportFormSelect'); if (f) f.value = '';
+    var from = document.getElementById('filterFrom'); if (from) from.value = '';
+    var to = document.getElementById('filterTo'); if (to) to.value = '';
+    var arch = document.getElementById('filterArchived'); if (arch) arch.checked = false;
+    Array.prototype.slice.call(document.querySelectorAll('.status-filter'))
+      .forEach(function (c) { c.checked = false; });
+    loadSubmissions();
+  }
+
+  // Status checkboxes are built from STATUSES so the filter stays in sync with
+  // the status list. No status checked = any status (recordMatches treats an
+  // empty status list as "match all").
+  function renderStatusFilters() {
+    var box = document.getElementById('statusFilters');
+    if (!box) return;
+    box.innerHTML = STATUSES.map(function (s) {
+      return '<label><input type="checkbox" class="status-filter" value="' + s.value +
+        '" onchange="loadSubmissions()"> ' + s.label + '</label>';
+    }).join('');
+  }
+  const STATUSES = [
+    { value: 'submitted',   label: 'Submitted',               color: '#3b82f6' },
+    { value: 'processing',  label: 'Processing',              color: '#f59e0b' },
+    { value: 'pending',     label: 'Pending',                 color: '#8b5cf6' },
+    { value: 'approved',    label: 'Approved',                color: '#10b981' },
+    { value: 'rejected',    label: 'Rejected',                color: '#ef4444' },
+    { value: 'returned',    label: 'Returned for Correction', color: '#f97316' },
+    { value: 'completed',   label: 'Completed',               color: '#059669' }
+  ];
+
+  const STATUS_DV = {
+    'submitted':  'ހުށަހެޅިފައި',
+    'processing': 'ޕްރޮސެސް ކުރަނީ',
+    'pending':    'ޕެންޑިންގް',
+    'approved':   'ޤަބޫލު ކުރެވިފައި',
+    'rejected':   'ބޭރު ކުރެވިފައި',
+    'returned':   'އިޞްލާޙަށް ފޮނުވިފައި',
+    'completed':  'ނިމިފައި'
+  };
+
+  // Audit action → Dhivehi label (for the per-case audit panel).
+  const AUDIT_ACTIONS = {
+    'login_ok':           'ލޮގިން ވެއްޖެ',
+    'login_fail':         'ލޮގިން ފެއިލްވި',
+    'login_rate_limited': 'ލޮގިން ރޭޓް ލިމިޓް',
+    'logout':             'ލޮގްއައުޓް',
+    'view_full':          'ރެކޯޑް ބެއްލެވި',
+    'status_change':      'ސްޓޭޓަސް ބަދަލުކުރި'
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.DataStore.init();
+    // Gate on the session: show the app only when a token is present, otherwise
+    // the login view. (A stale token that the server rejects will trip
+    // handleError on the first list load and bounce back to login.)
+    if (window.DataStore.isAdminLoggedIn()) showApp();
+    else showLogin('');
+  });
+
+  // ── ARCHIVE OVERLAY (client-local) ──────────────────────────────────────────
+  // The backend has NO archive endpoint and its submission list carries no
+  // archived_at, so archive/restore is kept as a LOCAL worklist-view preference in
+  // localStorage ('fc_admin_archived' = { ref: timestamp }). Nothing is ever
+  // deleted server-side; a marker is only ever SET or CLEARED, so a hidden case is
+  // always recoverable. This is per-browser, not
+  // synced across staff — see the handover notes.
+  function readArchiveMap() {
+    return JSON.parse(localStorage.getItem('fc_admin_archived') || '{}');
+  }
+  function writeArchiveMap(map) {
+    localStorage.setItem('fc_admin_archived', JSON.stringify(map));
+  }
+
+  // The last summary list fetched from the API (unfiltered). Used by export and
+  // auto-archive so they operate on the same set the list was built from.
+  var lastSummary = [];
+
+  async function loadSubmissions() {
+    try {
+      var all = await window.DataStore.listSubmissions();
+      lastSummary = all;
+      // Overlay the client-local archive markers onto each summary record so the
+      // shared recordMatches() filter (which keys off archived_at) works here too.
+      var arch = readArchiveMap();
+      all.forEach(function (r) { if (arch[r.ref_code]) r.archived_at = arch[r.ref_code]; });
+
+      refreshExportOptions(all);   // dropdown lists every form present (incl. archived)
+
+      var emptyEl = document.getElementById('emptyState');
+      var tableEl = document.getElementById('submissionsTable');
+      document.getElementById('submissionsBody').innerHTML = '';  // start clean so hidden stale rows never linger
+
+      if (!all.length) {
+        emptyEl.innerHTML = '<p style="font-size:1.1rem;margin-bottom:8px;">No submissions yet</p>' +
+          '<p>Submissions will appear here once forms are submitted.</p>';
+        emptyEl.style.display = '';
+        tableEl.style.display = 'none';
+        return;
+      }
+
+      // Filter (form / status / submitted-date / archived) BEFORE rendering.
+      // Default hides archived; the "Show archived" toggle reveals them.
+      var opts = currentFilterOpts();
+      var subs = all.filter(function (r) { return ExportCSV.recordMatches(r, opts); });
+      subs.sort(function (a, b) { return (b.submitted_at || 0) - (a.submitted_at || 0); });
+
+      if (!subs.length) {
+        emptyEl.innerHTML = '<p style="font-size:1.1rem;margin-bottom:8px;">No submissions match the current filters</p>' +
+          '<p>Adjust the filters above, or click "Clear filters".</p>';
+        emptyEl.style.display = '';
+        tableEl.style.display = 'none';
+        return;
+      }
+
+      emptyEl.style.display = 'none';
+      tableEl.style.display = '';
+
+      // Viewer role: read-only. Hide the status-update controls entirely (the
+      // server would 403 the update anyway — this is the UI half of that).
+      var isViewer = window.DataStore.adminRole() === 'viewer';
+
+      var tbody = document.getElementById('submissionsBody');
+      tbody.innerHTML = '';
+
+      subs.forEach(function (sub) {
+        var ref = sub.ref_code;
+        var statusInfo = STATUSES.find(function (s) { return s.value === sub.status; }) || STATUSES[0];
+        var date = sub.submitted_at ? new Date(sub.submitted_at).toLocaleString('en-GB') : '—';
+        var archived = !!sub.archived_at;
+        var idNum = sub.id_number || (sub.data && sub.data.id_number) || '—';
+        var phone = sub.contact_number || (sub.data && sub.data.contact_number) || '—';
+        var lastBy = sub.changed_by_name || '';   // newest history actor (from the API summary)
+
+        var statusOptions = STATUSES.map(function (s) {
+          return '<option value="' + s.value + '"' + (s.value === sub.status ? ' selected' : '') + '>' + s.label + '</option>';
+        }).join('');
+
+        // refs are server-validated to [A-Z0-9-] (see server.js REF_RE), so they
+        // cannot break out of these onclick string args — escHtml is belt-and-braces.
+        var refJs = escHtml(ref);
+        var archTag = archived ? '<span class="arch-tag">Archived</span>' : '';
+        var archBtn = archived
+          ? '<button class="btn-restore" onclick="restoreCase(\'' + refJs + '\')">Restore</button>'
+          : '<button class="btn-archive" onclick="archiveCase(\'' + refJs + '\')">Archive</button>';
+
+        // Update-status controls are omitted for viewers; officers+ get the full set.
+        // (ids keep the raw ref — they are only ever looked up with the same string.)
+        var updateCell = isViewer
+          ? '<span class="no-perm" dir="rtl">ބެއްލެވުމުގެ ހުއްދަ އެކަނި</span>'
+          : '<select class="status-select" id="sel_' + ref + '">' + statusOptions + '</select>' +
+            '<textarea class="note-input" id="note_' + ref + '" placeholder="Note (optional)" rows="3" style="margin-top:4px;resize:vertical;"></textarea>' +
+            '<div style="margin-top:4px;display:flex;gap:6px;align-items:center;">' +
+              '<button class="btn-update" onclick="updateStatus(\'' + refJs + '\')">Update</button>' +
+              '<span class="update-msg" id="msg_' + ref + '">Updated!</span>' +
+            '</div>';
+
+        var row = document.createElement('tr');
+        if (archived) row.className = 'row-archived';
+        row.innerHTML =
+          '<td><strong>' + escHtml(ref) + '</strong>' + archTag + '</td>' +
+          '<td>' + escHtml(sub.form_code || 'Fm-C-B20') + '</td>' +
+          '<td style="font-family:var(--font-en)">' + escHtml(idNum) + '</td>' +
+          '<td style="font-family:var(--font-en)"><bdi dir="ltr">' + escHtml(phone) + '</bdi></td>' +
+          '<td style="font-family:var(--font-en);font-size:0.82rem;">' + date + '</td>' +
+          '<td><span class="badge" style="background:' + statusInfo.color + '">' + statusInfo.label + '</span></td>' +
+          '<td style="font-family:var(--font-dv),\'Faruma\',sans-serif;" dir="rtl">' + escHtml(lastBy) + '</td>' +
+          '<td>' +
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;">' +
+              '<button class="btn-view" onclick="viewDetail(\'' + refJs + '\')">View</button>' + archBtn +
+            '</div>' +
+            updateCell +
+          '</td>';
+        tbody.appendChild(row);
+      });
+    } catch (e) {
+      if (handleError(e)) return;
+      console.error('Failed to load submissions:', e);
+      var emptyEl = document.getElementById('emptyState');
+      var tableEl = document.getElementById('submissionsTable');
+      if (tableEl) tableEl.style.display = 'none';
+      if (emptyEl) {
+        emptyEl.innerHTML = '<p style="font-size:1.1rem;margin-bottom:8px;">Could not load submissions</p>' +
+          '<p>' + escHtml(e.message) + '</p>';
+        emptyEl.style.display = '';
+      }
+    }
+  }
+
+  // ─── ARCHIVE / RESTORE (reversible; nothing is ever hard-deleted) ─────
+  // These only touch the client-local archive map — no server call.
+  function archiveCase(refCode) {
+    if (!confirm('Archive case ' + refCode + '?\n\nIt will be hidden from the default worklist but is NOT deleted — ' +
+                 'it stays retrievable via "Show archived" and can be restored at any time.\n\n' +
+                 '(Note: archiving here is a per-browser view preference, not stored on the server.)')) return;
+    var map = readArchiveMap();
+    map[refCode] = Date.now();
+    writeArchiveMap(map);
+    loadSubmissions();
+  }
+
+  function restoreCase(refCode) {
+    var map = readArchiveMap();
+    delete map[refCode];   // restore = clear the marker
+    writeArchiveMap(map);
+    loadSubmissions();
+  }
+
+  // MANUAL bulk cleanup. Archives every completed case whose LAST status change
+  // (final history entry timestamp — NOT submitted_at) is older than 7 days.
+  // Runs only from the button click; reports how many it archived. The summary
+  // list has no history, so each completed candidate's full record is fetched to
+  // read its last status-change timestamp.
+  var AUTO_ARCHIVE_DAYS = 7;
+  async function autoArchiveOld() {
+    try {
+      var cutoff = Date.now() - AUTO_ARCHIVE_DAYS * 24 * 60 * 60 * 1000;
+      var map = readArchiveMap();
+      var candidates = lastSummary.filter(function (s) {
+        return s.status === 'completed' && !map[s.ref_code];
+      });
+      var archived = [];
+      for (var i = 0; i < candidates.length; i++) {
+        var ref = candidates[i].ref_code;
+        var full = await window.DataStore.getSubmissionFull(ref);
+        if (!full) continue;
+        var hist = full.history || [];
+        // Key off the LAST status-change timestamp, not submitted_at, so a
+        // long-running case is not archived 7 days after it was first submitted.
+        var last = hist.length ? hist[hist.length - 1].timestamp : full.submitted_at;
+        if (last != null && last < cutoff) { map[ref] = Date.now(); archived.push(ref); }
+      }
+      if (archived.length) writeArchiveMap(map);
+      console.log('auto-archive: archived', archived.length, 'completed case(s):', archived);
+      alert(archived.length
+        ? 'Archived ' + archived.length + ' completed case(s) whose last status change was more than ' +
+          AUTO_ARCHIVE_DAYS + ' days ago:\n' + archived.join(', ')
+        : 'No completed cases older than ' + AUTO_ARCHIVE_DAYS + ' days to archive.');
+      loadSubmissions();
+    } catch (e) {
+      if (handleError(e)) return;
+      alert('Cleanup failed: ' + e.message);
+    }
+  }
+
+  // ─── DETAIL VIEW ────────────────────────────────────────────────
+  // Field key → human label mapping (Dhivehi where appropriate)
+  const FIELD_LABELS = {
+    applicant_full_name: '1.1 ފުރިހަމަ ނަން',
+    applicant_sex: 'ޖިންސް',
+    applicant_id_number: '1.2 އައިޑީ ނަންބަރު',
+    applicant_contact_number: '1.3 ކޮންޓެކްޓް',
+    applicant_dob: '1.4 އުފަން ތާރީޚް',
+    applicant_permanent_island: '1.5 ރަށް/ސިޓީ',
+    applicant_permanent_address: '1.5 ދާއިމީ އެޑްރެސް',
+    applicant_residential_island: '1.6 ރަށް/ސިޓީ',
+    applicant_residential_address: '1.6 ދިރިއުޅޭ',
+    applicant_service_address: '1.7 ލިޔެކިޔުން',
+    applicant_chosen_address: '1.8 އިޚްތިޔާރީ',
+    applicant_wali_details: '1.9 ހާލަތު',
+    respondent_full_name: '2.1 ފުރިހަމަ ނަން',
+    respondent_sex: 'ޖިންސް',
+    respondent_id_number: '2.2 އައިޑީ ނަންބަރު',
+    respondent_contact_number: '2.3 ކޮންޓެކްޓް',
+    respondent_dob: '2.4 އުފަން ތާރީޚް',
+    respondent_permanent_island: '2.5 ރަށް/ސިޓީ',
+    respondent_permanent_address: '2.5 ދާއިމީ އެޑްރެސް',
+    respondent_residential_island: '2.6 ރަށް/ސިޓީ',
+    respondent_residential_address: '2.6 ދިރިއުޅޭ',
+    respondent_service_address: '2.7 ލިޔެކިޔުން',
+    respondent_chosen_address: '2.8 އިޚްތިޔާރީ',
+    respondent_wali_details: '2.9 ހާލަތު',
+    marriage_certificate_number: '3.1 ސެޓްފިކެޓް ނަންބަރު',
+    marriage_number: '3.2 ކައިވެނީގެ ވ.',
+    marriage_detail_first: '3.3 ތަފްޞީލު',
+    statement_narrative: '4. ދައުވާގެ ބަޔާން',
+    divorce_suspicion_reasons: '5. ތަފްޞީލު',
+    incident_date: 'ހާދިސާ ތާރީޚް',
+    relief_type: '6.1 ހާލަތު',
+    suspicion_reason: '6.2 ވަރި ޝައްކުވާ ސަބަބު',
+    evidence_type: '6.3 ހެއްކާ ބެހޭ',
+    pregnancy_status: '6.4 ބަނޑަށް ވީ ޙާލަތު',
+    pregnancy_duration: 'ބަނޑަށް ވީ މުއްދަތު (މ.)',
+    children_count: '7.1 ދަރިންގެ ޢަދަދު',
+    child_support: '7.4 ދަރިންގެ ޚަރަދު',
+    impediment: '8.1 ހުރަސް',
+    impediment_details: '8.1.1 ތަފްޞީލު',
+    witnesses_available: '9.2 ހާޒިރުވެވޭ',
+    witness_unavailable_reason: '9.2.1 ސަބަބު',
+    witness_alternative: '9.2.2 ބަދަލު ގޮތެއް',
+    declarant_name: 'ހުށަހެޅި ފަރާތުގެ ނަން',
+    declarant_date: 'ތާރީޚް',
+    sms_phone: 'SMS ނަންބަރު'
+  };
+
+  function escHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function fmtValue(key, val) {
+    if (val === undefined || val === null || val === '') {
+      return '<span class="detail-value empty">—</span>';
+    }
+    if (Array.isArray(val)) {
+      if (!val.length) return '<span class="detail-value empty">—</span>';
+      return '<span class="detail-value">' + val.map(escHtml).join('، ') + '</span>';
+    }
+    // Image data URIs (selfie, signature, ID photo). Only render as an image if
+    // it is a genuine base64 data-image — a strict match, so a citizen-typed
+    // value that merely starts with "data:image" cannot break out of src="".
+    if (typeof val === 'string' && /^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=\s]+$/.test(val)) {
+      var cls = (key === 'declarant_signature') ? 'detail-sig' : 'detail-img';
+      return '<span class="detail-value"><img class="' + cls + '" src="' + escHtml(val) + '" alt=""></span>';
+    }
+    // "@file:<name>" — the file sits on the server; fetched with the session token
+    // after the detail renders (hydrateAttachments), never by a bare URL.
+    if (typeof val === 'string' && /^@file:[a-z0-9_]{1,60}\.(png|jpg|gif|webp|pdf|doc|docx)$/.test(val)) {
+      var fname = val.slice(6), isImg = /\.(png|jpg|gif|webp)$/.test(fname);
+      var cls2 = (key === 'declarant_signature') ? 'detail-sig' : 'detail-img';
+      return isImg
+        ? '<span class="detail-value"><img class="' + cls2 + '" data-att="' + escHtml(fname) + '" alt=""></span>'
+        : '<span class="detail-value"><button type="button" class="btn-sm" data-att-open="' + escHtml(fname) + '">' + escHtml(fname) + '</button></span>';
+    }
+    // a dial code and number ("+960 7861232") is isolated left-to-right so the
+    // RTL page does not print it the wrong way round
+    if (typeof val === 'string' && /^\+?\d[\d ]{5,}$/.test(val.trim())) {
+      return '<span class="detail-value"><bdi dir="ltr">' + escHtml(val) + '</bdi></span>';
+    }
+    return '<span class="detail-value">' + escHtml(val) + '</span>';
+  }
+
+  function renderSection(title, rows) {
+    if (!rows.length) return '';
+    var html = '<div class="detail-section"><h3>' + title + '</h3>';
+    rows.forEach(function (r) {
+      html += '<div class="detail-row"><div class="detail-label">' + r.label + '</div>' + r.html + '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function buildChildrenSection(data) {
+    var count = parseInt(data.children_count) || 0;
+    if (count === 0) return '';
+    var rows = [];
+    for (var i = 1; i <= count; i++) {
+      var name = data['child_' + i + '_name'] || '';
+      var dob = data['child_' + i + '_dob'] || '';
+      var sex = data['child_' + i + '_sex'] || '';
+      var cust = data['child_' + i + '_custody'] || '';
+      var sexDv = sex === 'male' ? 'ފިރިހެން' : sex === 'female' ? 'އަންހެން' : '';
+      var custDv = cust === 'mother' ? 'މައިމީހާ ގާތު' : cust === 'father' ? 'ބައްޕަ ގާތު' : '';
+      var summary = [name, dob, sexDv, custDv].filter(Boolean).join(' · ') || '—';
+      rows.push({ label: 'ދ. ' + i, html: '<span class="detail-value">' + escHtml(summary) + '</span>' });
+    }
+    return renderSection('7.2 ދަރިންގެ މައުލޫމާތު', rows);
+  }
+
+  function buildWitnessesSection(data) {
+    var rows = [];
+    [1, 2].forEach(function (n) {
+      var name = data['witness_' + n + '_name'] || '';
+      var idn = data['witness_' + n + '_id'] || '';
+      var addr = data['witness_' + n + '_address'] || '';
+      var ph = data['witness_' + n + '_phone'] || '';
+      if (name || idn || addr || ph) {
+        var summary = [name, idn, addr, ph].filter(Boolean).join(' · ');
+        rows.push({ label: 'ހެކިވެރި ' + n, html: '<span class="detail-value">' + escHtml(summary) + '</span>' });
+      }
+    });
+    return renderSection('9.1 ހެކިވެރިން', rows);
+  }
+
+  // Build the detail layout from the form's own spec: every step becomes a
+  // section, every field label is the verbatim Dhivehi label from the paper.
+  var DISPLAY_ONLY = { notice_block: 1, info_banner: 1, instructions_block: 1 };
+  // Takes an already-loaded spec (viewDetail loads it once and shares it with
+  // buildSpecLabelMap, so the spec is fetched a single time per detail open).
+  function buildGroupsFromSpec(spec) {
+      var groups = [];
+      (spec.steps || []).forEach(function (step) {
+        var rows = [];
+        if (step.type === 'review' || step.type === 'payment') return;
+        if (step.type === 'submitting_party') {
+          rows.push({ key: 'submitting_party', label: step.question_dv || 'ހައިސިއްޔަތު' });
+          rows.push({ key: 'poa_attorney_name', label: 'ބަދަލުގައި ހުށަހަޅާ ފަރާތުގެ ނަން' });
+          rows.push({ key: 'poa_document', label: 'ޕަވަރ އޮފް އެޓާރނީ' });
+          rows.push({ key: 'poa_grantor_id', label: 'ޙަވާލުކުރި ފަރާތުގެ އައިޑީ' });
+          rows.push({ key: 'poa_grantee_id', label: 'ޙަވާލުވި ފަރާތުގެ އައިޑީ' });
+          groups.push({ title: step.title_dv || 'ހައިސިއްޔަތު', rows: rows });
+          return;
+        }
+        if (step.type === 'declaration') {
+          groups.push({ title: 'އިޤްރާރު / ސޮއި / ފޮޓޯ', rows: [
+            { key: 'declarant_name', label: step.name_label_dv || 'ނަން' },
+            { key: 'declarant_date', label: step.date_label_dv || 'ތާރީޚް' },
+            { key: 'sms_phone', label: 'SMS ނަންބަރު' },
+            { key: 'declarant_signature', label: step.sign_label_dv || 'ސޮއި' },
+            { key: 'selfie_photo', label: 'ސެލްފީ' },
+            { key: 'payment_receipt', label: 'ޕޭމަންޓް ރީސީޓް' }
+          ]});
+          return;
+        }
+        (step.fields || []).forEach(function (f) {
+          if (DISPLAY_ONLY[f.type]) return;
+          if (f.type === 'court_use_block') return;   // staff box: no citizen data
+          if (!f.key && f.type !== 'attachments_checklist') return;
+          var num = f.number ? f.number + ' ' : '';
+          if (f.type === 'composite_group') {
+            (f.subfields || []).forEach(function (s) {
+              rows.push({ key: s.key, label: num + (s.label_dv || s.key) });
+            });
+            return;
+          }
+          if (f.type === 'dynamic_table') {
+            rows.push({ key: f.key, label: num + (f.label_dv || f.key), table: f });
+            return;
+          }
+          if (f.type === 'attachments_checklist') {
+            rows.push({ key: f.key || 'attachments', label: f.title_dv || 'ހުށަހަޅާ ތަކެތި' });
+            (f.items_dv || []).forEach(function (t, i) {
+              rows.push({ key: (f.key || 'attachments') + '_' + i + '_file',
+                          label: t.length > 46 ? t.substring(0, 46) + '…' : t });
+            });
+            return;
+          }
+          rows.push({ key: f.key, label: num + (f.label_dv || (f.options && f.options.length === 1 && f.options[0].label_dv) || f.key) });   // a single-option checkbox is labelled by its option
+        });
+        if (rows.length) {
+          var title = step.title_dv || step.step_key || '';
+          if (step.audience === 'staff_only') title += ' (staff)';
+          groups.push({ title: title, rows: rows });
+        }
+      });
+      return groups;
+  }
+
+  // Flat map of field key -> verbatim Dhivehi label, built from the same spec.
+  // The preferred source for the "other / uncovered keys" fallback so a stray
+  // key still shows its Dhivehi label instead of a raw English key
+  function buildSpecLabelMap(spec) {
+    var map = {};
+    (spec.steps || []).forEach(function (step) {
+      if (step.type === 'submitting_party' && step.question_dv) map['submitting_party'] = step.question_dv;
+      if (step.type === 'declaration') {
+        if (step.name_label_dv) map['declarant_name'] = step.name_label_dv;
+        if (step.date_label_dv) map['declarant_date'] = step.date_label_dv;
+        if (step.sign_label_dv) map['declarant_signature'] = step.sign_label_dv;
+      }
+      (step.fields || []).forEach(function (f) {
+        if (f.key && f.label_dv) map[f.key] = f.label_dv.replace(/ފުރިހަމަނަން/g, 'ފުރިހަމަ ނަން').replace(/\s*\(އަތޮޅާއި ރަށާއެކު\)/g, '').replace(/\s+:/g, ':').replace(/([^.])\.\s*$/, '$1');
+        // a field whose only text is its single option (a reveal checkbox) is labelled by that option
+        else if (f.key && f.options && f.options.length === 1 && f.options[0].label_dv) map[f.key] = f.options[0].label_dv;
+        if (f.type === 'composite_group') {
+          (f.subfields || []).forEach(function (s) { if (s.key && s.label_dv) map[s.key] = s.label_dv; });
+        }
+      });
+    });
+    return map;
+  }
+
+  // dynamic table values are stored flat: <tableKey>_<rowIdx>_<colKey>
+  function tableValueRows(f, label, d, used) {
+    var out = [];
+    for (var i = 1; i <= 50; i++) {
+      var parts = [];
+      (f.table.columns || []).forEach(function (c) {
+        var k = f.key + '_' + i + '_' + c.key;
+        used[k] = 1;
+        if (d[k] !== undefined && d[k] !== '') parts.push(d[k]);
+      });
+      if (parts.length) {
+        out.push({ label: label + ' ' + i, html: '<span class="detail-value">' + escHtml(parts.join(' · ')) + '</span>' });
+      }
+    }
+    return out;
+  }
+
+  async function viewDetail(refCode) {
+    var rec;
+    try {
+      rec = await window.DataStore.getSubmissionFull(refCode);
+    } catch (e) {
+      if (handleError(e)) return;
+      alert('Could not load submission ' + refCode + ': ' + e.message);
+      return;
+    }
+    if (!rec) { alert('Could not load submission ' + refCode); return; }
+    // JSON store returns data as an object; guard the string case defensively.
+    if (typeof rec.data === 'string') { try { rec.data = JSON.parse(rec.data); } catch (e) {} }
+    var d = rec.data || {};
+    var formCode = rec.form_code || d.form_code || 'Fm-C-B20';
+    // Combined submissions are stored one record per member form; each record's
+    // data keeps the full member list. Print needs every member form code.
+    var memberForms = (d.member_forms && d.member_forms.length) ? d.member_forms.slice() : [formCode];
+    currentDetail = { ref: refCode, data: d, formCode: formCode, forms: memberForms };
+
+    document.getElementById('detailTitle').textContent = 'Submission ' + refCode + ' — ' + formCode;
+
+    // Load the spec once; share it with the group builder and the label map.
+    var spec = null;
+    try { spec = await SpecLoader.load(formCode); } catch (e) { spec = null; }
+    var groups = spec ? buildGroupsFromSpec(spec) : null;
+    var specLabelMap = spec ? buildSpecLabelMap(spec) : {};
+    var html = '';
+    var used = { form_code: 1, ref_code: 1, id_number: 1, contact_number: 1, contact_email: 1, member_forms: 1, _corrections: 1, jurisdiction_answers: 1 };
+
+    if (groups) {
+      groups.forEach(function (g) {
+        var rows = [];
+        g.rows.forEach(function (r) {
+          if (r.table) {
+            var trs = tableValueRows(r, escHtml(r.label), d, used);
+            used[r.key] = 1;
+            rows = rows.concat(trs);
+            return;
+          }
+          used[r.key] = 1;
+          var v = d[r.key];
+          if (v === undefined || v === '' || (Array.isArray(v) && !v.length)) return;
+          rows.push({ label: escHtml(r.label), html: fmtValue(r.key, v) });
+        });
+        html += renderSection(escHtml(g.title), rows);
+      });
+    }
+
+    // anything not covered by the spec (legacy records, extra keys)
+    var otherRows = [];
+    Object.keys(d).forEach(function (key) {
+      if (used[key]) return;
+      var v = d[key];
+      if (v === undefined || v === '' || (Array.isArray(v) && !v.length)) return;
+      // Fallback chain: prefer the spec's verbatim Dhivehi label, then the
+      // hardcoded map, then the raw key as a last-resort safety net. Warn on any
+      // key that resolved with no Dhivehi label so gaps surface during testing.
+      var dvLabel = specLabelMap[key];
+      var label = dvLabel || FIELD_LABELS[key] || key;
+      if (!dvLabel && !FIELD_LABELS[key]) {
+        console.warn('[admin] no Dhivehi label for key "' + key + '" (form ' + formCode + ') — showing raw key');
+      }
+      otherRows.push({ label: escHtml(label), html: fmtValue(key, v) });
+    });
+    html += renderSection(groups ? 'އިތުރު / Other' : 'Data', otherRows);
+
+    // documents the citizen re-sent after a "returned for correction"
+    if (Array.isArray(d._corrections) && d._corrections.length) {
+      html += renderSection('އިޞްލާޙު / Corrections received', d._corrections.map(function (c, i) {
+        return { label: escHtml(specLabelMap[c.field] || c.field), html: '<span class="detail-value">' + escHtml(new Date(c.at).toLocaleString('en-GB')) + ' · ' + escHtml(c.file) + '</span>' };
+      }));
+    }
+    // the wizard's four jurisdiction answers, when the form came through the wizard
+    if (d.jurisdiction_answers && typeof d.jurisdiction_answers === 'object') {
+      html += renderSection('ސަރަހައްދީ އިޚްތިޞާޞް / Jurisdiction answers', Object.keys(d.jurisdiction_answers).map(function (k) {
+        var a = d.jurisdiction_answers[k] || {};
+        return { label: escHtml(k), html: '<span class="detail-value">' + escHtml([a.area, a.atoll, a.island].filter(Boolean).join(' / ')) + '</span>' };
+      }));
+    }
+    // Add timeline section. Each entry now shows changed_by_name (the officer who
+    // made the change) alongside status/time/note — internal court visibility.
+    if (rec.history && rec.history.length) {
+      var trows = rec.history.map(function (h, i) {
+        var t = new Date(h.timestamp);
+        var time = t.toLocaleString('en-GB');
+        var stat = STATUS_DV[h.status] || h.status;
+        var note = h.note ? ' — ' + h.note : '';   // escaped once, at interpolation below
+        var by = h.changed_by_name ? ' · ' + escHtml(h.changed_by_name) : '';
+        return { label: 'ހިސްޓޮރީ ' + (i+1), html: '<span class="detail-value">' + escHtml(stat) + ' · ' + escHtml(time) + escHtml(note) + by + '</span>' };
+      });
+      html += renderSection('Timeline / History', trows);
+    }
+
+    // Audit panel: "who did what on case X" (officer+). Loaded on demand; a viewer
+    // gets a 403 which is caught and shown as a polite no-permission note.
+    html += '<div class="detail-section"><h3>އޮޑިޓް / Audit</h3>' +
+      '<div style="padding:10px 12px;">' +
+        '<button type="button" class="btn btn-secondary" onclick="loadAudit(\'' + escHtml(refCode) + '\')" ' +
+          'style="font-family:var(--font-en);font-size:0.82rem;">Load audit trail</button>' +
+        '<div id="auditRows" style="margin-top:10px;"></div>' +
+      '</div></div>';
+
+    document.getElementById('detailBody').innerHTML = html || '<p style="text-align:center;color:#888;padding:40px;">No data</p>';
+    hydrateAttachments(refCode);
+    document.getElementById('detailModal').classList.add('open');
+  }
+
+  var currentDetail = null;
+
+  // Server-stored attachments: load images through the authenticated route and
+  // wire "open" buttons for documents.
+  function hydrateAttachments(ref) {
+    if (!window.DataStore.fetchAttachment) return;
+    var body = document.getElementById('detailBody');
+    Array.prototype.forEach.call(body.querySelectorAll('img[data-att]'), function (img) {
+      window.DataStore.fetchAttachment(ref, img.getAttribute('data-att'))
+        .then(function (blob) { img.src = URL.createObjectURL(blob); })
+        .catch(function () { img.alt = '(file unavailable)'; });
+    });
+    Array.prototype.forEach.call(body.querySelectorAll('button[data-att-open]'), function (btn) {
+      btn.onclick = function () {
+        window.DataStore.fetchAttachment(ref, btn.getAttribute('data-att-open'))
+          .then(function (blob) { window.open(URL.createObjectURL(blob), '_blank'); })
+          .catch(function (e) { handleError(e); });
+      };
+    });
+  }
+
+  // Load and render the per-case audit trail (newest-first from the server).
+  async function loadAudit(refCode) {
+    var box = document.getElementById('auditRows');
+    if (!box) return;
+    box.innerHTML = '<span style="color:#888;font-family:var(--font-en);font-size:0.82rem;">Loading…</span>';
+    try {
+      var rows = await window.DataStore.getAudit(refCode);
+      if (!rows.length) {
+        box.innerHTML = '<span style="color:#888;" dir="rtl">އެއްވެސް އޮޑިޓް ރެކޯޑެއް ނެތް</span>';
+        return;
+      }
+      box.innerHTML = rows.map(function (a) {
+        var time = a.at ? new Date(a.at).toLocaleString('en-GB') : '—';
+        var actor = a.actor_name || '—';
+        var action = AUDIT_ACTIONS[a.action] || a.action;
+        var det = '';
+        if (a.details != null) {
+          det = typeof a.details === 'string' ? a.details : JSON.stringify(a.details);
+        }
+        return '<div class="detail-row">' +
+            '<div class="detail-label" style="font-family:var(--font-en)">' + escHtml(time) + '</div>' +
+            '<div class="detail-value"><strong>' + escHtml(actor) + '</strong> · ' + escHtml(action) +
+              (det ? ' · <span style="font-family:var(--font-en);color:#666;">' + escHtml(det) + '</span>' : '') +
+            '</div></div>';
+      }).join('');
+    } catch (e) {
+      if (handleError(e)) return;
+      // Viewer role → server returns 403 for the audit endpoint.
+      if (e && e.message === 'API 403') {
+        box.innerHTML = '<span class="no-perm" dir="rtl">އޮޑިޓް ބެއްލެވުމުގެ ހުއްދައެއް ނެތް</span>';
+        return;
+      }
+      box.innerHTML = '<span style="color:#ef4444;" dir="rtl">އޮޑިޓް ލޯޑް ނުކުރެވުނު</span>';
+    }
+  }
+
+  // Extract every uploaded file/photo/signature (stored as data: URIs) from the
+  // open submission and download them so staff can save them to their own
+  // server/records — a working attachment handoff.
+  function downloadAttachments() {
+    if (!currentDetail || !currentDetail.data) { alert('No submission open'); return; }
+    var d = currentDetail.data, ref = currentDetail.ref, n = 0;
+    var EXT = { 'image/png':'png','image/jpeg':'jpg','image/jpg':'jpg','image/gif':'gif',
+                'image/webp':'webp','application/pdf':'pdf',
+                'application/msword':'doc',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'docx' };
+    function save(href, name) {
+      var a = document.createElement('a');
+      a.href = href; a.download = name;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+    Object.keys(d).forEach(function (key) {
+      var v = d[key];
+      if (typeof v !== 'string') return;
+      if (/^@file:[a-z0-9_]{1,60}\.[a-z0-9]{3,4}$/.test(v) && window.DataStore.fetchAttachment) {
+        var fname = v.slice(6);              // stored on the server: fetch with the session
+        window.DataStore.fetchAttachment(ref, fname)
+          .then(function (blob) { save(URL.createObjectURL(blob), ref + '__' + fname); })
+          .catch(function (e) { handleError(e); });
+        n++;
+        return;
+      }
+      var m = /^data:([^;,]+)[;,]/.exec(v);
+      if (!m) return;                       // not an embedded file
+      save(v, ref + '__' + key + '.' + (EXT[m[1]] || 'bin'));
+      n++;
+    });
+    if (!n) alert('This submission has no uploaded files.');
+  }
+
+  // Print / PDF. Hands the open record to
+  // print.html via sessionStorage, then opens it in a new tab. Contract:
+  // fc_print_payload = { forms: [<code(s)>], data: <record data>, ref: <ref_code> }.
+  // `forms` is always an array — a single form is a one-element array; a combined
+  // submission lists every member form code.
+  function printRecord() {
+    if (!currentDetail || !currentDetail.data) { alert('No submission open'); return; }
+    sessionStorage.setItem('fc_print_payload', JSON.stringify({
+      forms: (currentDetail.forms && currentDetail.forms.length) ? currentDetail.forms : [currentDetail.formCode],
+      data: currentDetail.data,
+      ref: currentDetail.ref
+    }));
+    window.open('print.html', '_blank');
+  }
+
+  function closeDetail() {
+    var m = document.getElementById('detailModal');
+    if (m) m.classList.remove('open');
+  }
+
+  async function updateStatus(refCode) {
+    var select = document.getElementById('sel_' + refCode);
+    var noteInput = document.getElementById('note_' + refCode);
+    if (!select || !noteInput) return;   // viewer rows have no update controls
+    var newStatus = select.value;
+    var statusDv = STATUS_DV[newStatus] || newStatus;
+    var note = noteInput.value.trim();
+
+    try {
+      // Identity is NEVER sent — the server derives the actor from the session.
+      await window.DataStore.updateSubmissionStatus(refCode, newStatus, statusDv, note);
+      var msg = document.getElementById('msg_' + refCode);
+      msg.style.display = 'inline';
+      setTimeout(function () { msg.style.display = 'none'; }, 2000);
+      noteInput.value = '';
+      // Reload to refresh badges + "last changed by"
+      loadSubmissions();
+    } catch (e) {
+      if (handleError(e)) return;
+      if (e && e.message === 'API 403') {
+        alert('ސްޓޭޓަސް ބަދަލުކުރުމުގެ ހުއްދައެއް ނެތް');   // "no permission to change status"
+        return;
+      }
+      alert('Update failed: ' + e.message);
+    }
+  }
+  // ── staff accounts (admin role) ────────────────────────────────────────────
+  function escS(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function staffMsg(t, bad) { var m = document.getElementById('staffMsg'); m.textContent = t; m.style.color = bad ? '#b00020' : '#1b7f3b'; }
+  function toggleStaff() { var p = document.getElementById('staffPanel'); var open = p.style.display === 'none'; p.style.display = open ? '' : 'none'; if (open) loadStaff(); }
+  async function loadStaff() {
+    var tb = document.getElementById('staffRows'); tb.innerHTML = '';
+    try {
+      var users = await window.DataStore.listUsers();
+      users.forEach(function (u) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td style="padding:6px 4px;">' + escS(u.username) + '</td><td style="padding:6px 4px;" dir="auto">' + escS(u.display_name) + '</td><td style="padding:6px 4px;">' + escS(u.role) + '</td><td style="padding:6px 4px;">' + (u.active ? 'active' : 'deactivated') + '</td>' +
+          '<td style="text-align:right;white-space:nowrap;padding:6px 4px;"><button type="button" class="btn btn-secondary" style="font-family:var(--font-en);" onclick="setStaffActive(\'' + escS(u.username) + '\',' + (u.active ? 'false' : 'true') + ')">' + (u.active ? 'Deactivate' : 'Activate') + '</button> ' +
+          '<button type="button" class="btn btn-secondary" style="font-family:var(--font-en);" onclick="setStaffPassword(\'' + escS(u.username) + '\')">Set password</button></td>';
+        tb.appendChild(tr);
+      });
+    } catch (e) { if (handleError(e)) return; staffMsg('Accounts could not be loaded: ' + (e.detail || e.message), true); }
+  }
+  async function addStaff(ev) {
+    ev.preventDefault();
+    try {
+      await window.DataStore.createUser({ username: document.getElementById('staffUser').value.trim(), display_name: document.getElementById('staffName').value.trim(), role: document.getElementById('staffRole').value, password: document.getElementById('staffPass').value });
+      document.getElementById('staffAddForm').reset(); staffMsg('Account created.'); loadStaff();
+    } catch (e) { if (handleError(e)) return false; staffMsg('Account not created: ' + (e.detail || e.message), true); }
+    return false;
+  }
+  async function setStaffActive(username, active) {
+    try { await window.DataStore.setUserActive(username, active); staffMsg((active ? 'Activated ' : 'Deactivated ') + username + '.'); loadStaff(); }
+    catch (e) { if (handleError(e)) return; staffMsg('Not changed: ' + (e.detail || e.message), true); }
+  }
+  async function setStaffPassword(username) {
+    var pw = window.prompt('New password for ' + username + ' (8 or more characters). The account\'s open sessions end.');
+    if (pw === null) return;
+    try { await window.DataStore.setUserPassword(username, pw); staffMsg('Password set for ' + username + '.'); }
+    catch (e) { if (handleError(e)) return; staffMsg('Password not set: ' + (e.detail || e.message), true); }
+  }
+  </script>
+</body>
+</html>

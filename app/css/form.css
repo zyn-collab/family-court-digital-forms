@@ -1,0 +1,580 @@
+/* === Form-specific Styles === */
+
+.form-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 28px 20px;
+}
+
+/* --- Form Title Area --- */
+.form-title-area {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.form-code-badge {
+  display: inline-block;
+  background: var(--color-primary);
+  color: white;
+  padding: 3px 16px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-family: var(--font-en);
+  margin-bottom: 10px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.form-title-area .form-title {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  line-height: 2.1;
+  font-weight: 700;
+}
+.form-instruction {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  max-width: 580px;
+  margin: 0 auto;
+  line-height: 2;
+}
+
+/* --- Draft Bar --- */
+.draft-bar {
+  background: #fffbeb;
+  border: 1.5px solid #fbbf24;
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+}
+
+/* --- Progress Bar --- */
+.wizard-progress { margin-bottom: 28px; }
+.progress-bar {
+  height: 3px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.progress-steps {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.progress-step {
+  font-size: 0.75rem;
+  font-family: var(--font-en);
+  color: var(--color-text-secondary);
+  width: auto;
+  min-width: 30px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--color-surface);
+  font-weight: 600;
+}
+.progress-step:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.progress-step.active {
+  color: white;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(109, 26, 65, 0.25);
+}
+.progress-step.skipped { opacity: 0.25; text-decoration: line-through; cursor: default !important; }   /* step ruled out by an earlier answer */
+.progress-step.completed {
+  color: white;
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+.progress-text {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-top: 8px;
+  font-family: var(--font-en);
+}
+
+/* --- Section Card --- */
+.section-card {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  box-shadow: var(--shadow-sm);
+}
+.section-card[hidden] { display: none; }
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--color-primary);
+  line-height: 2.1;
+}
+.section-title .en {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+  display: block;
+  font-family: var(--font-en);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* --- Field Groups --- */
+.field-group {
+  margin-bottom: 22px;
+}
+.field-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--color-text);
+  line-height: 2;
+}
+.field-label .en {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+  font-family: var(--font-en);
+}
+.field-label .required-mark {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+.field-label .new-field-badge {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.7rem;
+  font-family: var(--font-en);
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-inline-end: 6px;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+/* Select dropdown */
+.field-select {
+  appearance: auto;
+  cursor: pointer;
+}
+
+/* --- Input Styles --- */
+.field-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-dv);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  background: var(--color-surface);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  color: var(--color-text);
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(109, 26, 65, 0.12);
+}
+.field-input::placeholder {
+  color: #b0b3b8;
+}
+textarea.field-input {
+  min-height: 90px;
+  resize: vertical;
+}
+.field-input.has-error {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
+}
+
+/* --- Radio / Checkbox --- */
+.radio-group, .checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.radio-group.inline, .checkbox-group.inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.radio-option, .checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.93rem;
+  line-height: 1.8;
+  background: var(--color-surface);
+}
+.radio-option:hover, .checkbox-option:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+.radio-option input, .checkbox-option input {
+  accent-color: var(--color-primary);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+/* Selected state */
+.radio-option:has(input:checked),
+.checkbox-option:has(input:checked) {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+/* --- Error Messages --- */
+.field-error {
+  color: var(--color-error);
+  font-size: 0.82rem;
+  margin-top: 4px;
+  display: none;
+}
+.field-error.visible { display: block; }
+
+/* --- Sub-field Groups (composite/parent) --- */
+.field-sub-group {
+  margin-top: 10px;
+  padding: 14px 16px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* --- Tables --- */
+.form-table-wrapper {
+  overflow-x: auto;
+  position: relative;   /* the hidden native file input (.file-native, absolute) must stay inside the scroll box, or it widens the page on a phone */
+  margin: 16px 0;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-border);
+  /* edge shadows that appear only where there is more table to scroll to */
+  background:
+    linear-gradient(to right, #fff 30%, rgba(255,255,255,0)),
+    linear-gradient(to right, rgba(255,255,255,0), #fff 70%) 100% 0,
+    radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.16), rgba(0,0,0,0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.16), rgba(0,0,0,0)) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+.form-table-wrapper .form-table th, .form-table-wrapper .form-table td { background-clip: padding-box; }
+.form-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.form-table th {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  padding: 10px 12px;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+  line-height: 1.9;
+}
+.form-table td {
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  vertical-align: top;
+}
+.form-table input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-dv);
+  font-size: 0.85rem;
+}
+.form-table input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+.table-add-row {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border: 1.5px dashed var(--color-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-dv);
+  font-size: 0.85rem;
+}
+.table-add-row:hover { background: var(--color-primary); color: white; }
+
+/* --- Declaration Block --- */
+.declaration-block {
+  background: var(--color-primary-light);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-top: 16px;
+}
+.declaration-text {
+  font-size: 0.88rem;
+  line-height: 2;
+  margin-bottom: 16px;
+}
+.declaration-text li { margin-bottom: 10px; }
+.fee-info {
+  background: #fffbeb;
+  border: 1.5px solid #fbbf24;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 12px;
+  font-size: 0.88rem;
+}
+
+/* --- Wizard Navigation --- */
+.wizard-nav {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  gap: 16px;
+}
+
+.review-actions {
+  margin-top: 24px;
+}
+.export-panel {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+}
+.export-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--color-primary-dark);
+  line-height: 2;
+}
+.export-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+@media (max-width: 600px) {
+  .export-buttons { flex-direction: column; }
+  .export-buttons .btn { width: 100%; }
+}
+
+/* --- Signature Field --- */
+.signature-area {
+  border-bottom: 2px solid var(--color-text);
+  padding-bottom: 4px;
+  margin-top: 20px;
+  min-width: 200px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .form-container { padding: 16px 12px; }
+  .section-card { padding: 24px 18px; }
+  .field-row { grid-template-columns: 1fr; }
+  .wizard-nav { flex-direction: column; }
+  .wizard-nav .btn { width: 100%; }
+  .progress-steps { gap: 6px; }
+  .progress-step { width: 26px; height: 26px; font-size: 0.7rem; }
+  .radio-group.inline { flex-direction: column; }
+}
+
+.char-counter { display: block; text-align: left; direction: ltr; unicode-bidi: isolate; font-family: var(--font-en); font-variant-numeric: tabular-nums; font-size: 0.76rem; color: var(--color-text-secondary, #8a7a82); margin-top: 4px; }
+/* number fields keep the browser arrows: asked for them back, so that it
+   is visible the field steps number by number. */
+/* icons drawn in the notification / help colour, sized like the text */
+.notif-icon { display: inline-flex; align-items: center; color: currentColor; }
+.notif-icon svg { width: 20px; height: 20px; }
+.form-notification.info .notif-icon { color: #1d5ea8; }
+.form-notification.warning .notif-icon { color: #8a5a00; }
+.form-notification.error .notif-icon { color: #b0332a; }
+.form-notification.success .notif-icon { color: #1f6b3a; }
+.payment-step-panel .payment-icon svg { color: var(--color-primary, #6d1a41); }
+.dv-kb-btn { display: inline-flex; align-items: center; gap: 6px; }
+
+
+.field-label { display: inline-flex; flex-direction: row-reverse; align-items: baseline; gap: 6px; }   /* asterisk after the text */
+.declaration-block { text-align: center; }                                                          
+.declaration-block .declaration-text { display: inline-block; text-align: right; font-size: 1.08rem; padding: 14px 26px; }
+.payment-step-panel { padding: 14px 16px !important; }                                              /* much smaller */
+.payment-step-panel .payment-icon { font-size: 1.4rem !important; margin-bottom: 4px !important; }
+.payment-step-panel .payment-title { font-size: 1.05rem !important; margin: 4px 0 !important; }
+.payment-step-panel .payment-amount { margin: 6px 0 !important; }
+.payment-help-btn { background: none; border: 1px solid var(--color-border); border-radius: 999px; padding: 4px 12px; font-family: inherit; cursor: pointer; font-size: 0.85rem; margin-inline-start: 8px; }
+.ref-notice-big .dv { font-size: 1.12rem; font-weight: 600; }                                       /* bigger */
+.ref-notice-big .ref-code-display { font-size: 1.5rem; }
+.notify-block { border: 1px solid var(--color-border); border-radius: 10px; padding: 14px 16px; margin: 18px 0; background: #fff; }
+/* optional on-screen Dhivehi keyboard (shown under the focused Thaana-only field) */
+.dv-kb-btn { margin: -6px 0 12px; padding: 6px 12px; border: 1px solid var(--color-border, #d9c9d2); border-radius: 8px; background: #fff; cursor: pointer; font-size: 0.9rem; }
+.dv-keyboard { direction: rtl; margin: 0 0 14px; padding: 10px; border: 1px solid var(--color-border, #d9c9d2); border-radius: 10px; background: #faf7f8; }
+.dv-kb-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; justify-content: flex-start; }
+.dv-kb-key { min-width: 38px; height: 40px; padding: 0 8px; border: 1px solid #d9c9d2; border-radius: 6px; background: #fff; font-family: var(--font-dv); font-size: 1.15rem; cursor: pointer; }
+.dv-kb-key.wide { min-width: 120px; }
+.dv-kb-key:active { background: #f0dde6; }
+.phone-row { display: flex; gap: 8px; direction: ltr; }
+.phone-row select { flex: 0 0 150px; font-family: var(--font-en); }
+/* dial-code picker: flag + code on the field, names in the list */
+.cc-picker { position: relative; flex: 0 0 auto; }
+.cc-btn { display: flex; align-items: center; gap: 8px; height: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--color-border, #d9c9d2); border-radius: 8px; background: #fff; font-family: var(--font-en); font-size: 1rem; cursor: pointer; direction: ltr; }
+.cc-flag { width: 24px; height: 17px; border-radius: 2px; object-fit: cover; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+.cc-caret { font-size: 0.7rem; opacity: .6; }
+.cc-list { position: absolute; z-index: 30; top: calc(100% + 4px); left: 0; width: 260px; max-height: 300px; overflow-y: auto; background: #fff; border: 1px solid var(--color-border, #d9c9d2); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12); padding: 6px; direction: ltr; }
+.cc-search { width: 100%; box-sizing: border-box; margin-bottom: 6px; padding: 8px 10px; border: 1px solid #e5d8de; border-radius: 6px; font-family: var(--font-en); }
+.cc-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 8px; border: 0; background: none; text-align: left; font-family: var(--font-en); font-size: 0.95rem; border-radius: 6px; cursor: pointer; }
+.cc-item:hover { background: #f5e6ee; }
+.cc-item img { width: 22px; height: 15px; border-radius: 2px; object-fit: cover; }
+.cc-item .cc-name { flex: 1; }
+.cc-item .cc-code { color: #6b5a63; }
+.cc-item[hidden] { display: none; }
+/* file inputs: Dhivehi button + chosen name instead of the browser's own control */
+.file-native { position: absolute !important; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+.file-pick { display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.file-btn { display: inline-block; padding: 9px 16px; border: 1px solid var(--color-primary, #6d1a41); border-radius: 8px; color: var(--color-primary, #6d1a41); background: #fff; cursor: pointer; font-size: 0.95rem; }
+.file-btn:hover { background: #f5e6ee; }
+.file-name { font-family: var(--font-en); font-size: 0.88rem; color: #4a3a42; direction: ltr; word-break: break-all; }
+.file-native.has-error + .file-pick .file-btn { border-color: #c0392b; }
+.phone-row input { flex: 1; }
+.phone-row select { direction: ltr; text-align: left; }   /* dial code reads +960 Maldives, not reversed by the RTL page */
+html[dir="rtl"] .phone-row select { direction: ltr !important; text-align: left !important; }   /* beats the rtl.css select rule */
+
+
+/* ── Day-4 comments ──────────────────────────────── */
+/* The reference-code notice takes less room on a phone. */
+@media (max-width: 600px) {
+  .ref-notice-big { padding: 10px 12px; }
+  .ref-notice-big .dv { font-size: 0.95rem; }
+  .ref-notice-big .ref-code-display { font-size: 1.15rem; }
+  .ref-notice-big .btn-sm { font-size: 0.78rem; padding: 5px 10px; }
+}
+/* A name cell in a table is wide enough to read what was typed. */
+.form-table td input[type="text"] { min-width: 170px; }
+/* Faruma everywhere: a button does not inherit the page font on its own. */
+button, textarea { font-family: inherit; }
+.dv-kb-btn { font-family: var(--font-dv); }
+/* The payment guidance video is a link, not an embedded player. */
+.video-link-line { margin: 10px 0 0; }
+
+/* ── Day-4, second pass ────────────────────────────────────────────────── */
+/* Dates are typed as numbers (dd/mm/yyyy); the button opens the browser's calendar. */
+.date-input { font-family: var(--font-en); direction: ltr; text-align: left; letter-spacing: 0.02em; }
+.date-wrap { position: relative; display: flex; align-items: stretch; gap: 6px; }
+.date-wrap .date-input { flex: 1; min-width: 0; }
+.date-cal { flex: none; width: 44px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); background: #fff; color: var(--color-primary, #6d1a41); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.date-cal:hover { background: #f5e6ee; }
+.date-native { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+/* After the first page the reference code is small, faded text under the form name. */
+.ref-notice-big.ref-quiet { background: none; border: 0; box-shadow: none; padding: 0 0 8px; margin: -6px 0 6px; opacity: 0.55; }
+.ref-notice-big.ref-quiet .dv { font-size: 0.78rem; font-weight: 400; }
+.ref-notice-big.ref-quiet .ref-code-display { font-size: 0.92rem; }
+.ref-notice-big.ref-quiet .notif-icon { display: none; }
+.ref-notice-big.ref-quiet .btn-sm { font-size: 0.72rem; padding: 2px 8px; }
+.ref-notice-big.ref-quiet br { display: none; }
+.ref-notice-big.ref-quiet .ref-code-display { border: 0; background: none; padding: 0 4px; letter-spacing: 0.04em; }
+
+/* ── Day-5 ─────────────────────────────────────────────────────────────── */
+/* Thaana page letters in the progress bubbles */
+.progress-step .dv { font-family: var(--font-dv); font-size: 0.95rem; line-height: 1; }
+/* Searchable lists: the native select stays for data and validation, the box in front does the typing */
+select.ss-native { position: absolute !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+select.ss-native[hidden] + .ss-box { display: none; }   /* the typing box follows its list: an island list hidden for an address abroad, a country list hidden otherwise */
+.ss-box { position: relative; }
+.ss-list { position: absolute; z-index: 30; top: calc(100% + 4px); right: 0; left: 0; max-height: 280px; overflow-y: auto; background: #fff; border: 1px solid var(--color-border, #d9c9d2); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12); padding: 6px; }
+.ss-item { display: block; width: 100%; padding: 8px 10px; border: 0; background: none; text-align: right; font-family: var(--font-dv); font-size: 0.98rem; border-radius: 6px; cursor: pointer; }
+.ss-item[dir="ltr"], .ss-input[dir="ltr"] { text-align: left; font-family: var(--font-en); }
+.ss-item:hover, .ss-item.on { background: #f5e6ee; }
+.ss-none { padding: 8px 10px; color: #8a7a82; font-size: 0.9rem; }
+.form-table .ss-box { min-width: 170px; }
+/* Errors listed under the buttons, each a link to its question */
+.step-errors { margin: 18px 0 0; }
+.step-errors ul { margin: 6px 0 0; padding-inline-start: 18px; }
+.step-errors li { margin: 4px 0; }
+.step-errors-title { font-weight: 600; }
+.step-err-link { background: none; border: 0; padding: 0; color: #b0332a; text-decoration: underline; cursor: pointer; font: inherit; font-family: var(--font-dv); }
+.step-err-msg { color: #6b5a63; font-size: 0.86rem; }
+/* The restart link under the buttons on the form pages */
+.form-restart-row { display: flex; justify-content: center; margin-top: 10px; }
+.wizard-restart { background: none; border: 1px solid var(--color-border, #d9c9d2); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-family: var(--font-dv); font-size: 0.85rem; color: var(--color-text-secondary, #8a7a82); }
+.wizard-restart:hover { color: var(--color-primary, #6d1a41); border-color: var(--color-primary, #6d1a41); }
+
+/* ── Day-6 ─────────────────────────────────────────────────────────────── */
+.modal-box { position: relative; }
+.modal-x { position: absolute; top: 8px; left: 10px; width: 34px; height: 34px; border: 0; background: none; font-size: 1.6rem; line-height: 1; color: var(--color-text-secondary, #8a7a82); cursor: pointer; border-radius: 50%; font-family: var(--font-en); }
+.modal-x:hover { background: #f5e6ee; color: var(--color-primary, #6d1a41); }
+.form-table th .required-mark { margin-inline-end: 3px; }
+
+/* ──: five ideas from the Supreme Court flow ────────────────── */
+/* the pages by name, beside the form; only where the screen has the room */
+.form-container { position: relative; }
+.step-nav { display: none; }
+@media (min-width: 1380px) {
+  .step-nav { display: block; position: absolute; top: 28px; bottom: 0; right: -260px; width: 230px; }
+  .step-list { position: sticky; top: 96px; list-style: none; margin: 0; padding: 0 12px 0 0; border-right: 2px solid var(--color-border, #e5d8de); }
+  .step-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; color: var(--color-text-secondary, #8a7a82); font-size: 0.9rem; cursor: default; position: relative; }
+  .step-item.reachable { cursor: pointer; }
+  .step-item.reachable:hover .sn-name { color: var(--color-primary, #6d1a41); }
+  .step-item .sn-badge { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--color-border, #d9c9d2); background: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-en); font-size: 0.72rem; font-weight: 600; }
+  .step-item .sn-badge.dv { font-family: var(--font-dv); font-size: 0.9rem; }
+  .step-item.completed .sn-badge { background: var(--color-success, #1f6b3a); border-color: var(--color-success, #1f6b3a); color: #fff; }
+  .step-item.active { color: var(--color-primary, #6d1a41); font-weight: 600; }
+  .step-item.active .sn-badge { background: var(--color-primary, #6d1a41); border-color: var(--color-primary, #6d1a41); color: #fff; }
+  .step-item.skipped { opacity: 0.35; text-decoration: line-through; }
+  .step-item .sn-name { line-height: 1.5; }
+}
+/* same as the permanent address */
+.same-addr { margin: 0 0 10px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.92rem; }
+.address-group.addr-locked .addr-fields { opacity: 0.6; pointer-events: none; }
+/* what an upload accepts */
+.file-hint { display: block; margin-top: 4px; font-size: 0.78rem; color: var(--color-text-secondary, #8a7a82); }
+.file-hint .en { font-family: var(--font-en); direction: ltr; unicode-bidi: isolate; }
+/* optional fields say so */
+.optional-mark { font-weight: 400; font-size: 0.82rem; color: var(--color-text-secondary, #8a7a82); margin-inline-start: 4px; }
+/* a case number: its own panel, left-to-right entry */
+.case-lookup { background: #f7f2f4; border: 1px solid var(--color-border, #e5d8de); border-radius: 10px; padding: 14px 16px; }
+.case-lookup .case-hint { margin: -4px 0 8px; font-size: 0.82rem; color: var(--color-text-secondary, #8a7a82); }
+.case-lookup .case-input { font-family: var(--font-en); direction: ltr; text-align: left; letter-spacing: 0.04em; }
+
+/* ── Day-7 ─────────────────────────────────────────────────────────────── */
+#errorModal .modal-box { max-width: 520px; }
+.step-errors-list { margin: 10px 0 0; padding-inline-start: 18px; max-height: 60vh; overflow-y: auto; }
+.step-errors-list li { margin: 6px 0; }
+[data-instructions] .instructions-block { margin-top: 0 !important; }

@@ -1,0 +1,32 @@
+# Family Court digital forms — whole system on one host.
+#   docker compose up -d
+# Site:  http://localhost:8080   (the forms, status page, admin page)
+# API:   http://localhost:8080/api/...  (proxied to the backend container)
+# Edit app/js/site-config.js so FC_API_BASE points at the public address of this host.
+# Staff accounts:  docker compose exec api node user-cli.js add <username> "<Name>" officer
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - backend/.env
+    environment:
+      FC_TRUST_PROXY: "1"
+    volumes:
+      - fc-data:/data
+    restart: unless-stopped
+
+  web:
+    image: nginx:1.27-alpine
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/usr/share/nginx/html:ro
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+
+volumes:
+  fc-data:

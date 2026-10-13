@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="dv" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Print — Family Court</title>
+  <!-- base.css carries the @font-face for the bundled Faruma Thaana font + theme vars -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/print.css">
+</head>
+<body class="print-body">
+
+  <!-- Operator chrome: hidden by .no-print when printing / saving as PDF -->
+  <div class="print-toolbar no-print">
+    <a class="print-toolbar-link" href="index.html">← <span class="dv">ފޯމުތައް</span></a>
+    <button type="button" id="printBtn" class="print-toolbar-btn" onclick="window.print()">
+      🖨 <span class="dv">ޕްރިންޓް ކުރައްވާ</span>
+    </button>
+    <span class="print-toolbar-status" id="printStatus"></span>
+  </div>
+
+  <div id="printRoot"></div>
+
+  <script src="specs/specs-bundle.js"></script>
+  <script src="js/spec-loader.js"></script>
+  <script src="js/site-config.js"></script>
+  <script src="js/data-layer.js"></script>
+  <script src="js/lookups.js"></script>
+  <script src="js/combine-specs.js"></script>
+  <script src="js/print-render.js"></script>
+  <script>
+    (function () {
+      function fail(msg) {
+        var root = document.getElementById('printRoot');
+        root.innerHTML = '<div style="padding:48px;text-align:center;font-family:system-ui;direction:ltr">' +
+          '<h2>Nothing to print</h2><p>' + msg + '</p>' +
+          '<p>Use <code>?form=Fm-C-XX</code>, <code>?forms=A,B</code>, <code>?ref=CODE</code>, ' +
+          '<code>?resume=CODE</code> or <code>?blank=1</code>.</p>' +
+          '<p><a href="index.html">← Forms list</a></p></div>';
+      }
+
+      document.addEventListener('DOMContentLoaded', async function () {
+        try { window.DataStore && window.DataStore.init(); } catch (e) { /* */ }
+        var params = new URLSearchParams(window.location.search);
+
+        var forms = [], data = {}, ref = null, blank = false;
+
+        // (1) sessionStorage handoff from form.html / admin.html — read AND remove.
+        var payload = null;
+        try {
+          var raw = sessionStorage.getItem('fc_print_payload');
+          if (raw) { payload = JSON.parse(raw); sessionStorage.removeItem('fc_print_payload'); }
+        } catch (e) { /* private mode / bad JSON */ }
+
+        if (payload && payload.forms && payload.forms.length) {
+          forms = payload.forms;
+          data = payload.data || {};
+          ref = payload.ref || null;
+        } else {
+          // (2) URL params
+          blank = params.get('blank') === '1';
+          var formsParam = (params.get('forms') || '').split(',')
+            .map(function (s) { return s.trim(); }).filter(Boolean);
+          var formParam = params.get('form');
+          if (formsParam.length) forms = formsParam;
+          else if (formParam) forms = [formParam];
+
+          var lookup = params.get('ref') || params.get('resume');
+          if (lookup && !blank) {
+            ref = lookup.toUpperCase();
+            var rec = null;
+            // ?ref → a submission; ?resume → a draft. Try the stated source first,
+            // then the other, via the active data layer (localStorage today).
+            try {
+              if (params.get('ref')) {
+                var full = await window.DataStore.getSubmissionFull(ref);
+                if (full) rec = (typeof full.data === 'string') ? JSON.parse(full.data) : full.data;
+              }
+              if (!rec) rec = await window.DataStore.loadDraft(ref);
+              if (!rec && !params.get('ref')) {
+                var full2 = await window.DataStore.getSubmissionFull(ref);
+                if (full2) rec = (typeof full2.data === 'string') ? JSON.parse(full2.data) : full2.data;
+              }
+            } catch (e) { /* offline / missing */ }
+            if (rec) {
+              data = rec;
+              if (!forms.length) {
+                forms = (rec.member_forms && rec.member_forms.length) ? rec.member_forms
+                      : (rec.form_code ? [rec.form_code] : []);
+              }
+            }
+          }
+        }
+
+        if (!forms.length) { fail('No form was specified.'); return; }
+
+        var spec;
+        try {
+          spec = (forms.length > 1) ? await CombineSpecs.load(forms)
+                                    : await SpecLoader.load(forms[0]);
+        } catch (e) { fail('Could not load spec: ' + e.message); return; }
+
+        try { document.title = (spec.title_dv || spec.form_code || 'Print') + ' — ' + (spec.form_code || ''); } catch (e) { /* */ }
+
+        PrintRender.render(document.getElementById('printRoot'), spec, data, { blank: blank, ref: ref });
+
+        var status = document.getElementById('printStatus');
+        if (status) status.textContent = blank ? 'ހުސް ފޯމު' : (ref ? ref : '');
+      });
+    })();
+  </script>
+</body>
+</html>

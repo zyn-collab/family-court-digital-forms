@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="dv" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ފޯމު ހޮވުމުގެ އެހީ — ފެމިލީ ކޯޓު</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/rtl.css">
+  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="css/widgets.css">
+  <style>
+    body { background: #f7f4f6; }
+    .wizard-card { max-width: 680px; margin: 22px auto; background: #fff; border-radius: 16px;
+      padding: 32px 34px; box-shadow: 0 6px 24px rgba(69,18,44,0.08); }
+    .wizard-q { font-size: 1.22rem; font-weight: 700; margin-bottom: 6px; line-height: 1.9; }
+    .wizard-q-en { font-size: 0.78rem; color: #a89ea6; direction: ltr; text-align: left; margin-bottom: 18px; }
+    .wizard-opt { display: block; width: 100%; text-align: right; padding: 16px 20px; margin: 10px 0;
+      border: 1.5px solid var(--color-border); border-radius: 12px; background: #fbf8fa; cursor: pointer;
+      font-family: inherit; font-size: 1.05rem; transition: all .15s; }
+    .wizard-opt:hover { border-color: var(--color-primary); background: #f6ecf1; transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(69,18,44,0.08); }
+    .wizard-opt .en { display: block; font-size: 0.74rem; color: #a89ea6; direction: ltr; text-align: left; margin-top: 3px; }
+    .wizard-nav-row { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+    .wizard-back { background: #fff; border: 2px solid var(--color-primary); color: var(--color-primary); cursor: pointer;
+      font-family: inherit; font-size: 1.1rem; font-weight: 700; padding: 13px 26px; border-radius: 12px; flex: 1; }
+    .wizard-back:hover { background: #f6ecf1; }
+    .wizard-restart { background: none; border: 1px solid var(--color-border); color: #7a6b73; cursor: pointer;
+      font-family: inherit; font-size: 0.95rem; padding: 13px 18px; border-radius: 12px; }
+    .wizard-restart:hover { color: var(--color-primary); border-color: var(--color-primary); }
+    .juris-note { background: #fff7e0; border: 1px solid #eedc9a; border-radius: 12px; padding: 16px 20px;
+      margin-bottom: 14px; line-height: 1.85; }
+    .juris-note h3 { margin: 0 0 8px; font-size: 1.05rem; color: #8a6d1a; }
+    .juris-note.fail { background: #fdecec; border-color: #f0b4b4; text-align: center; padding: 22px 20px; }
+    .juris-note.fail p { margin: 0; font-size: 1.15rem; font-weight: 700; color: #8a1f1f; line-height: 2; }
+    .juris-q { margin-bottom: 20px; }
+    .juris-q .field-label { font-weight: 700; font-size: 1.02rem; line-height: 1.9; }
+    .juris-island { display: flex; gap: 10px; margin-top: 8px; }
+    .juris-island[hidden] { display: none; }   /* author display:flex would otherwise beat the hidden attribute */
+    .juris-island select, .juris-island input { flex: 1; min-width: 0; }
+    .juris-continue { width: 100%; margin-top: 6px; padding: 15px 24px; font-size: 1.1rem; }
+    /* forms-you-need list (informational) */
+    .need-list { margin: 4px 0 22px; }
+    .need-item { display: flex; align-items: center; gap: 12px; padding: 13px 16px; margin: 8px 0;
+      border: 1px solid var(--color-border); border-right: 4px solid var(--color-primary);
+      border-radius: 12px; background: #fbf8fa; font-weight: 600; line-height: 1.8; }
+    .need-item .chk { width: 24px; height: 24px; flex: none; display: inline-flex; align-items: center;
+      justify-content: center; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 0.8rem; }
+    .need-item .code { font-family: monospace; font-size: 0.72rem; color: #a89ea6; direction: ltr; }
+    /* PRIMARY action */
+    .fill-cta { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+      background: var(--color-primary); color: #fff; text-decoration: none; font-weight: 700; font-size: 1.15rem;
+      padding: 17px 24px; border-radius: 14px; box-shadow: 0 8px 22px rgba(109,26,65,0.30);
+      transition: transform .12s, box-shadow .12s; }
+    .fill-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(109,26,65,0.40); }
+    .cta-note { text-align: center; font-size: 0.82rem; color: #8a7d84; margin: 10px 0 0; }
+    /* BACKUP (secondary) */
+    .backup { margin-top: 22px; border-top: 1px solid var(--color-border); padding-top: 8px; }
+    .backup > summary { cursor: pointer; color: #8a7d84; font-size: 0.9rem; padding: 8px 2px; list-style: none; }
+    .backup > summary::-webkit-details-marker { display: none; }
+    .backup > summary:hover { color: var(--color-primary); }
+    .backup-row { display: flex; align-items: center; gap: 8px; padding: 9px 6px; border-bottom: 1px dashed var(--color-border); }
+    .backup-row .mini { background: #f4eef1; color: var(--color-primary); text-decoration: none;
+      padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; }
+    .backup-row .mini.pdf { direction: ltr; }
+    .backup-row .mini:hover { background: #ece0e6; }
+    .draft-banner { background: #eef4fb; border: 1px solid #cfe0f2; border-radius: 10px; padding: 10px 16px;
+      margin: 14px auto 0 auto; max-width: 680px; font-size: 0.82rem; }
+    .steps-dots { text-align: center; margin-top: 10px; font-size: 0.8rem; color: #a89ea6; }
+  </style>
+</head>
+<body>
+  <header class="court-header no-print">
+    <div class="header-content">
+      <div class="court-info">
+        <a href="index.html" class="back-link">← ފޯމުތައް</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="form-container">
+    <div class="wizard-card" id="wizardCard"></div>
+  </div>
+
+
+  <script src="specs/specs-bundle.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/spec-loader.js"></script>
+  <script src="js/form-index.js"></script>
+  <script>
+  // ─── STEP 0: territorial jurisdiction ───────────────────────────────
+  // The four address questions on one page; "other" opens an island
+  // picker; "abroad" offered on all four; "don't know" only for the respondent;
+  // at least one of the four must be Malé City — otherwise filing is blocked
+  // with the wording the Court supplied (JURIS_FAIL_DV).
+  // Question text is copied from the feedback document (bbox-ordered text
+  // extraction, checked against the rendered page).
+  const JURIS_QUESTIONS = [
+    { key: 'applicant_permanent',  q: 'މައްސަލަ ހުށަހަޅާ ފަރާތުގެ ދާއިމީ އެޑްރެސް އޮންނަނީ ކޮންތަނަކު ހެއްޔެވެ؟', unknown: false },
+    { key: 'applicant_current',    q: 'މައްސަލަ ހުށަހަޅާ ފަރާތް، މިހާރު ދިރިއުޅޭ އެޑްރެސް އޮންނަނީ ކޮންތަނަކު ހެއްޔެވެ؟', unknown: false },
+    { key: 'respondent_permanent', q: 'މައްސަލަ ރައްދުވާ ފަރާތުގެ ދާއިމީ އެޑްރެސް އޮންނަނީ ކޮންތަނަކު ހެއްޔެވެ؟', unknown: true },
+    { key: 'respondent_current',   q: 'މައްސަލަ ރައްދުވާ ފަރާތް، މިހާރު ދިރިއުޅޭ އެޑްރެސް އޮންނަނީ ކޮންތަނަކު ހެއްޔެވެ؟', unknown: true }
+  ];
+  const JURIS_OPTIONS = [
+    { value: 'male',    t: 'މާލެ ސިޓީ' },
+    { value: 'other',   t: 'މާލެ ސިޓީ ފިޔަވައި އެހެން ރަށެއްގައި' },   // (transliteration)
+    { value: 'abroad',  t: 'ރާއްޖޭން ބޭރުގައި' },     // "abroad" — asked for in English only; spelling as in the validated forms (ރާއްޖޭން ބޭރުގައި ނަމަ)
+    { value: 'unknown', t: 'ނޭނގޭ' }                    // respondent questions only
+  ];
+  const JURIS_FAIL_DV = 'މައްސަލަ ހުށަހެޅުމުގެ ސަރަހައްދީ އިޚްތިޞާޞް ނުލިބޭ';  // Court wording, received
+  const REQUIRED_DV = 'މިބައި ފުރިހަމަކުރައްވާ!';                          // Court wording
+  // ─── The very first screen:
+  // "who is submitting the form?" — myself / another party. The answer travels
+  // to the form as ?party=party|poa and pre-answers its first step.
+  const PARTY_Q_DV = 'ފޯމު ހުށަހަޅަނީ ކާކު؟';
+  const PARTY_OPTIONS = [
+    { value: 'party', t: 'އަމިއްލައަށް' },
+    { value: 'poa',   t: 'އެހެން ފަރާތެއް މެދުވެރިކޮށް' }
+  ];
+  let party = null;
+
+  function renderParty() {
+    const card = document.getElementById('wizardCard');
+    let html = '<p class="wizard-q"><span class="dv">' + PARTY_Q_DV + '</span></p>';
+    PARTY_OPTIONS.forEach(function (o) {
+      html += '<button type="button" class="wizard-opt' + (party === o.value ? ' selected' : '') +
+              '" data-party="' + o.value + '" onclick="pickParty(\'' + o.value + '\')">' +
+              '<span class="dv">' + o.t + '</span></button>';
+    });
+    card.innerHTML = html;
+  }
+  function pickParty(v) { party = v; renderJurisdiction(); }
+
+  const jurisdiction = {};   // key -> { area, atoll, island }
+  let ATOLLS = null;         // data/atolls-islands.json (http only; file:// falls back to free text)
+
+  function loadAtolls() {
+    if (ATOLLS !== null) return Promise.resolve(ATOLLS);
+    return fetch('data/atolls-islands.json')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        ATOLLS = (d.atolls || []).filter(function (a) { return a.code !== 'Male'; });   // Malé City is its own option
+        return ATOLLS;
+      })
+      .catch(function () { ATOLLS = []; return ATOLLS; });
+  }
+
+  function renderJurisdiction() {
+    const card = document.getElementById('wizardCard');
+    let html = '';
+    JURIS_QUESTIONS.forEach(function (jq) {
+      html += '<div class="field-group juris-q" data-key="' + jq.key + '">' +
+        '<label class="field-label"><span class="required-mark">*</span><span class="dv">' + jq.q + '</span></label>' +
+        '<div class="radio-group">';
+      JURIS_OPTIONS.forEach(function (o) {
+        if (o.value === 'unknown' && !jq.unknown) return;
+        html += '<label class="radio-option"><input type="radio" name="juris_' + jq.key + '" value="' + o.value +
+                '" onchange="jurisChanged(\'' + jq.key + '\')"><span class="dv">' + o.t + '</span></label>';
+        if (o.value === 'other') {
+          // the atoll/island picker sits directly under its own option
+          html += '<div class="juris-island" id="island_' + jq.key + '" hidden>' +
+            '<select class="field-input field-select" id="atoll_' + jq.key + '" onchange="jurisAtollChanged(\'' + jq.key + '\')"></select>' +
+            '<select class="field-input field-select" id="isl_' + jq.key + '"></select>' +
+            '<input class="field-input" type="text" id="isltext_' + jq.key + '" hidden>' +
+          '</div>';
+        }
+      });
+      html += '</div>' +
+        '<div class="field-error" id="err_juris_' + jq.key + '"></div>' +
+      '</div>';
+    });
+    html += '<button type="button" class="btn btn-primary juris-continue" id="jurisContinue" onclick="checkJurisdiction()">' +
+            '<span class="dv">ކުރިއަށް</span></button>' +
+            '<div class="wizard-nav-row"><button type="button" class="wizard-back" onclick="renderParty()">→ ފަހަތަށް</button>' +
+            '<button type="button" class="wizard-restart" onclick="restart()">↺ އަލުން ފައްޓަވާ</button></div>';
+    card.innerHTML = html;
+    loadAtolls().then(function () {
+      JURIS_QUESTIONS.forEach(function (jq) { fillAtollSelect(jq.key); restoreJuris(jq.key); });
+    });
+  }
+
+  function fillAtollSelect(key) {
+    const sel = document.getElementById('atoll_' + key);
+    const isl = document.getElementById('isl_' + key);
+    const txt = document.getElementById('isltext_' + key);
+    if (!ATOLLS || !ATOLLS.length) {           // no data (file://): free-text island name
+      sel.hidden = true; isl.hidden = true; txt.hidden = false;
+      txt.placeholder = 'ރަށް / އަތޮޅު';
+      return;
+    }
+    sel.innerHTML = '<option value="">އަތޮޅު</option>' +
+      ATOLLS.map(function (a) { return '<option value="' + a.code + '">' + a.name_dv.split(' (')[0] + '</option>'; }).join('');   // letter code only
+    isl.innerHTML = '<option value="">ރަށް</option>';
+  }
+
+  function jurisAtollChanged(key) {
+    const code = document.getElementById('atoll_' + key).value;
+    const isl = document.getElementById('isl_' + key);
+    const atoll = (ATOLLS || []).find(function (a) { return a.code === code; });
+    isl.innerHTML = '<option value="">ރަށް</option>' +
+      ((atoll && atoll.islands) || []).map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join('');
+    jurisdiction[key] = jurisdiction[key] || {};
+    jurisdiction[key].atoll = code; jurisdiction[key].island = '';
+  }
+
+  function jurisChanged(key) {
+    const checked = document.querySelector('input[name="juris_' + key + '"]:checked');
+    jurisdiction[key] = jurisdiction[key] || {};
+    jurisdiction[key].area = checked ? checked.value : '';
+    document.getElementById('island_' + key).hidden = jurisdiction[key].area !== 'other';
+    clearJurisError(key);
+  }
+
+  function restoreJuris(key) {
+    const j = jurisdiction[key];
+    if (!j || !j.area) return;
+    const r = document.querySelector('input[name="juris_' + key + '"][value="' + j.area + '"]');
+    if (r) { r.checked = true; jurisChanged(key); }
+    if (j.area === 'other' && ATOLLS && ATOLLS.length && j.atoll) {
+      document.getElementById('atoll_' + key).value = j.atoll;
+      jurisAtollChanged(key);
+      if (j.island) document.getElementById('isl_' + key).value = j.island;
+    }
+  }
+
+  function showJurisError(key, msg) {
+    const el = document.getElementById('err_juris_' + key);
+    el.textContent = msg; el.classList.add('visible');
+  }
+  function clearJurisError(key) {
+    const el = document.getElementById('err_juris_' + key);
+    el.textContent = ''; el.classList.remove('visible');
+  }
+
+  function checkJurisdiction() {
+    let ok = true;
+    JURIS_QUESTIONS.forEach(function (jq) {
+      const j = jurisdiction[jq.key] || {};
+      clearJurisError(jq.key);
+      if (!j.area) { showJurisError(jq.key, REQUIRED_DV); ok = false; return; }
+      if (j.area === 'other') {
+        if (ATOLLS && ATOLLS.length) {
+          j.island = document.getElementById('isl_' + jq.key).value;
+          if (!j.atoll || !j.island) { showJurisError(jq.key, REQUIRED_DV); ok = false; }
+        } else {
+          j.island = document.getElementById('isltext_' + jq.key).value.trim();
+          if (!j.island) { showJurisError(jq.key, REQUIRED_DV); ok = false; }
+        }
+      }
+    });
+    if (!ok) {
+      const first = document.querySelector('.field-error.visible');
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    // the Court's rule: at least one of the four addresses must be Malé City
+    const inMale = JURIS_QUESTIONS.some(function (jq) { return jurisdiction[jq.key].area === 'male'; });
+    if (inMale) { show('start'); return; }
+    const card = document.getElementById('wizardCard');
+    card.innerHTML =
+      '<div class="juris-note fail" id="jurisFail"><p><span class="dv">' + JURIS_FAIL_DV + '</span></p></div>' +
+      '<div class="wizard-nav-row"><button type="button" class="wizard-back" onclick="renderJurisdiction()">→ ފަހަތަށް</button>' +
+      '<button type="button" class="wizard-restart" onclick="restart()">↺ އަލުން ފައްޓަވާ</button></div>';
+  }
+
+  // ─── Decision tree ───
+  const TREE = {
+    start: {
+      q: 'މައްސަލައިގެ ބާވަތް ޚިޔާރުކުރައްވާ!',
+      q_en: 'Choose the type of case',
+      options: [
+        { t: 'ވަރިއާ ގުޅޭ މައްސަލަ', t_en: 'Divorce-related', next: 'divorce' },
+        { t: 'ދަރިންނާ ގުޅޭ މައްސަލަ', t_en: 'Children (custody, maintenance, paternity…)', next: 'children' },
+        { t: 'ގެވެށި އަނިޔާއާ ގުޅޭ މައްސަލަ', t_en: 'Domestic violence', next: 'dv' },   // wording
+        { t: 'ޢާއިލީ އެހެނިހެން މައްސަލަ', t_en: 'Other family matter', next: 'other' },
+        // reconciliation moves out from under the divorce branch and becomes
+        // the fifth category on this screen; the wording is the one it already had.
+        { t: 'ޞުލްޙަވުމަށް އެދި', t_en: 'Request reconciliation (sulha)', forms: ['Fm-C-B02'] }
+      ]
+    },
+    // The
+    // "children under 18?" follow-up was cut on (b0053: މިބައި އެއްކޮށް
+    // އުނިކޮއްލުމަށް — "otherwise it's filling double parallel forms").
+    divorce: {
+      q: 'ބޭނުންވާ ކަމަކާ ގުޅޭ ފޯމެއް އިޚްތިޔާރު ކުރައްވާ!',
+      q_en: 'Choose the form for what you need',
+      options: [
+        { t: 'ވަރިކުރުމަށް ނުވަތަ ވަރިވުމަށް އެދި', t_en: 'Apply for divorce', forms: ['Fm-C-B03C'] },
+        { t: 'ވަރިސާބިތުކުރުމަށް އެދި', t_en: 'Confirm a divorce that already happened', forms: ['Fm-C-B04'] },
+        { t: 'ވަރިވެފައިވާކަމާމެދު ޝައްކުވެގެން', t_en: 'Unsure whether a divorce occurred', forms: ['Fm-C-B20'] }
+      ]
+    },
+    children: {
+      q: 'ކޮން ބާވަތެއްގެ މައްސަލައެއްތޯ؟',
+      q_en: 'Which kind of matter?',
+      options: [
+        { t: 'ޙަޟާނަތުގެ މައްސަލަ', t_en: 'Custody', forms: ['Fm-C-B07'] },   // no parallel forms — one form at a time
+        { t: 'ޚަރަދުގެ މައްސަލަ', t_en: 'Maintenance / expenses', forms: ['Fm-C-B05'] },
+        { t: 'ނަސަބުގެ މައްސަލަ', t_en: 'Paternity', forms: ['Fm-C-B19'] },
+        { t: 'ބަލަދުވެރިކަން ސާބިތުކުރުން', t_en: 'Guardianship confirmation', forms: ['Fm-C-B21'] }
+      ]
+    },
+    // "Edhey amuruge baavaiy", two options only (both open Fm-C-B15; the choice
+    // pre-answers its section 6). The modify/cancel and child-order forms moved under "other".
+    // ("Replace this page with ބާވަތް … to choose one"): four kinds;
+    // the first three open Fm-C-B15 with its section 6 answered, the fourth Fm-C-B16.
+    dv: {
+      q: 'ބާވަތް',
+      q_en: 'Type of order',
+      options: [
+        { t: 'ރައްކާތެރިކުރުމުގެ އަމުރު', t_en: 'Protection order', forms: ['Fm-C-B15'], order: 'protection_order' },
+        { t: 'ރައްކާތެރިކުރުމުގެ އަވަސް އަމުރު', t_en: 'Emergency protection order', forms: ['Fm-C-B15'], order: 'emergency_protection_order' },
+        { t: 'ތަފްރީޤް ނުވަތަ ފަސްޚު ކުރުމުގެ އަމުރު', t_en: 'Tafreeq or faskh order', forms: ['Fm-C-B15'], order: 'tafreeq_faskh_order' },
+        { t: 'ރައްކާތެރިކުރުމުގެ އަމުރަށް ބަދަލު ގެނައުން ނުވަތަ ބާޠިލު ކުރުން', t_en: 'Modify or cancel a protection order', forms: ['Fm-C-B16'] }
+      ]
+    },
+    other: {
+      q: 'ކޮން ބާވަތެއްގެ މައްސަލައެއްތޯ؟',
+      q_en: 'Which kind of matter?',
+      options: [
+        { t: 'ވަލީގެ މައްސަލަ (ވަލީ ހޯދުމަށް)', t_en: 'Wali (guardian consent) case', forms: ['Fm-C-B01'] },
+        { t: 'މަރު ސާބިތުކުރުން', t_en: 'Death confirmation', forms: ['Fm-C-B12'] },
+        { t: 'ޢާއިލީ އެހެނިހެން މައްސަލަ', t_en: 'Other family matter', forms: ['Fm-C-B08'] },
+        { t: 'ކުޑަކުއްޖަކާ ގުޅޭ ކޯޓު އަމުރަކަށް އެދެން', t_en: 'Court order under the Child Rights Protection Act', forms: ['Fm-C-B28'] },
+        { t: 'ޙުކުމް ތަންފީޛުކުރުން / އިސްތިއުނާފު / އޮންލައިން ޝަރީޢަތް', t_en: 'Enforcement / appeal / online hearing', next: 'procedural' }
+      ]
+    },
+    procedural: {
+      q: 'ކޮން އިޖުރާއީ ކަމެއްތޯ؟',
+      q_en: 'Which procedural request?',
+      options: [
+        { t: 'ޙުކުމް ތަންފީޛުކުރުމަށް', t_en: 'Enforce a judgment', forms: ['Fm-C-B17'] },
+        { t: 'ނިންމުމެއް އިސްތިއުނާފު ކުރުމަށް', t_en: 'Appeal a decision', forms: ['Fm-C-B24'] },
+        { t: 'އޮންލައިންކޮށް ޝަރީޢަތް ހިންގުމަށް', t_en: 'Request an online hearing', forms: ['Fm-C-B11'] }
+      ]
+    }
+  };
+
+  let selection = [];
+  let orderChoice = null;   // which protection order (pre-answers the DV form's section 6)
+  const history = [];
+
+  function show(nodeKey) {
+    const node = TREE[nodeKey];
+    const card = document.getElementById('wizardCard');
+    let html = '<p class="wizard-q"><span class="dv">' + node.q + '</span></p>';
+    node.options.forEach(function (o, i) {
+      html += '<button type="button" class="wizard-opt" onclick="pick(\'' + nodeKey + '\',' + i + ')">' +
+              '<span class="dv">' + o.t + '</span></button>';
+    });
+    html += '<div class="wizard-nav-row"><button type="button" class="wizard-back" onclick="goBack()">→ ފަހަތަށް</button>' +
+            '<button type="button" class="wizard-restart" onclick="restart()">↺ އަލުން ފައްޓަވާ</button></div>';
+    card.innerHTML = html;
+  }
+
+  function pick(nodeKey, i) {
+    const o = TREE[nodeKey].options[i];
+    history.push({ node: nodeKey, selection: selection.slice() });
+    if (o.forms) selection = selection.concat(o.forms);
+    if (o.add) selection = selection.concat(o.add);
+    if (o.order) orderChoice = o.order;
+    if (o.next) { show(o.next); } else { goToForm(); }
+  }
+
+  function goBack() {
+    const prev = history.pop();
+    if (!prev) { renderJurisdiction(); return; }
+    selection = prev.selection;
+    show(prev.node);
+  }
+
+  // no "these are your forms" page — the last answer
+  // opens the form directly (a combined flow when the path yields more than one form).
+  function goToForm() {
+    const codes = selection.filter(function (c, i) { return selection.indexOf(c) === i; });
+    if (!codes.length) { restart(); return; }
+    const multi = codes.length > 1;
+    const target = (multi ? 'form.html?forms=' + codes.join(',') : 'form.html?form=' + codes[0]) +
+                   (party ? '&party=' + party : '') +
+                   (orderChoice ? '&order=' + orderChoice : '') +
+                   (Object.keys(jurisdiction).length ? '&juris=' + encodeURIComponent(JSON.stringify(jurisdiction)) : '');
+    window.location.href = target;
+  }
+
+  async function showResult() {   // kept for direct links (?result=) — no longer part of the flow
+    const card = document.getElementById('wizardCard');
+    const codes = selection.filter(function (c, i) { return selection.indexOf(c) === i; });
+    if (!codes.length) { card.innerHTML = '<p class="dv">ފޯމެއް ނުހޮވުނު.</p>'; return; }
+    const multi = codes.length > 1;
+    const target = (multi ? 'form.html?forms=' + codes.join(',') : 'form.html?form=' + codes[0]) +
+                   (party ? '&party=' + party : '');
+
+    // resolve titles first
+    const items = [];
+    for (const code of codes) {
+      let title = code;
+      try { const s = await SpecLoader.load(code); title = s.title_dv || code; } catch (e) {}
+      items.push({ code: code, title: title, pdf: (window.FC_FORMS && FC_FORMS.pdf[code]) || '' });
+    }
+
+    let html = '<p class="wizard-q"><span class="dv">ތިޔަ ހާލަތަށް ބޭނުންވާ ފޯމު' + (multi ? 'ތައް' : '') + ':</span></p>';
+
+    // the forms you need (informational list — not competing actions)
+    html += '<div class="need-list">';
+    items.forEach(function (it) {
+      html += '<div class="need-item"><span class="chk">✓</span>' +
+              '<span class="dv" style="flex:1;">' + it.title + '</span>' +
+              '<span class="code">' + it.code + '</span></div>';
+    });
+    html += '</div>';
+
+    // PRIMARY action — big, obvious, the recommended path
+    html += '<a class="fill-cta" href="' + target + '">' +
+              '<span class="dv">' + (multi ? 'މި ފޯމުތައް އޮންލައިންކޮށް ފުރުއްވާ' : 'މި ފޯމު އޮންލައިންކޮށް ފުރުއްވާ') + '</span>' +
+              '<span aria-hidden="true">➜</span></a>';
+    if (multi) html += '<p class="cta-note dv">ހުރިހާ ފޯމެއް އެއްފަހަރާ — އެއް މައުލޫމާތެއް ދެފަހަރު ލިޔާކަށް ނުޖެހޭނެ</p>';
+
+    // BACKUP options — clearly secondary
+    html += '<details class="backup"><summary class="dv">ނުވަތަ ވަކިވަކިން ފުރުއްވުމަށް ނުވަތަ PDF ޑައުންލޯޑް ކުރެއްވުމަށް</summary>';
+    items.forEach(function (it) {
+      html += '<div class="backup-row">' +
+              '<span class="dv" style="flex:1;">' + it.title + '</span>' +
+              '<a class="mini" href="form.html?form=' + it.code + '"><span class="dv">އޮންލައިންކޮށް</span></a>' +
+              (it.pdf ? '<a class="mini pdf" href="' + encodeURI(it.pdf) + '" target="_blank" rel="noopener">PDF</a>' : '') +
+              '</div>';
+    });
+    html += '</details>';
+
+    html += '<button type="button" class="wizard-back" onclick="restart()">↺ އަލުން ފައްޓަވާ</button>';
+    card.innerHTML = html;
+  }
+
+  function restart() { selection = []; history.length = 0; party = null; orderChoice = null; renderParty(); }
+  renderParty();
+  </script>
+</body>
+</html>

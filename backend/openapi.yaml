@@ -1,0 +1,316 @@
+openapi: 3.0.3
+info:
+  title: Family Court digital forms — backend API
+  version: "1.0.0"
+  description: |
+    The HTTP contract between the forms site (app/) and the backend (backend/server.js),
+    and the integration surface for the Court's own systems. Prose version: backend/API.md.
+    All bodies are JSON (UTF-8). Dhivehi travels as plain UTF-8 text.
+    Public routes need no credentials; admin routes need `Authorization: Bearer <token>`
+    from POST /api/admin/login. Roles: viewer < officer < admin.
+servers:
+  - url: https://forms.familycourt.gov.mv
+    description: production (API proxied under /api on the site's origin)
+  - url: http://localhost:4000
+    description: development
+tags:
+  - name: public
+  - name: admin
+  - name: integration
+paths:
+  /api/health:
+    get:
+      tags: [public]
+      summary: Liveness and store kind
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema: { type: object, properties: { ok: { type: boolean }, store: { type: string }, uptime_s: { type: number } } }
+  /api/refs:
+    post:
+      tags: [public]
+      summary: Issue a reference number (unique, reserved as an empty draft)
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object, properties: { prefix: { type: string, pattern: "^[A-Z]{2,4}$" }, form_code: { type: string } } }
+      responses:
+        "200": { description: issued, content: { application/json: { schema: { type: object, properties: { ref_code: { type: string } } } } } }
+        "400": { description: bad prefix }
+  /api/drafts/{ref}:
+    parameters: [ { $ref: "#/components/parameters/ref" } ]
+    put:
+      tags: [public]
+      summary: Create or replace a draft
+      requestBody: { content: { application/json: { schema: { $ref: "#/components/schemas/DataEnvelope" } } } }
+      responses:
+        "200": { description: saved }
+        "400": { description: bad reference or data shape }
+        "409": { description: the number has already been submitted }
+        "429": { description: rate limited (120/min per IP) }
+    get:
+      tags: [public]
+      summary: Load a draft
+      responses:
+        "200": { description: the draft, content: { application/json: { schema: { $ref: "#/components/schemas/DataEnvelope" } } } }
+        "404": { description: none or expired }
+    delete:
+      tags: [public]
+      summary: Delete a draft
+      responses: { "200": { description: deleted } }
+  /api/submissions/{ref}:
+    parameters: [ { $ref: "#/components/parameters/ref" } ]
+    put:
+      tags: [public]
+      summary: Submit a form (attachments inside `data` as data URIs)
+      description: |
+        Files are decoded, type-checked from their bytes (PNG, JPEG, GIF, WEBP, PDF, DOC, DOCX),
+        capped at FC_MAX_FILE_MB, written under FC_UPLOADS_DIR/<ref>/ and replaced in the record
+        by `@file:<name>` markers. The draft is deleted. Triggers the `submitted` event and the SMS/email receipt.
+      requestBody: { content: { application/json: { schema: { $ref: "#/components/schemas/DataEnvelope" } } } }
+      responses:
+        "200": { description: accepted, content: { application/json: { schema: { type: object, properties: { ref_code: { type: string }, attachments: { type: array, items: { type: string } } } } } } }
+        "400": { description: "invalid data or a rejected file ({ error, field })" }
+        "409": { description: already submitted }
+  /api/submissions/{ref}/status:
+    parameters: [ { $ref: "#/components/parameters/ref" } ]
+    get:
+      tags: [public]
+      summary: Public status by reference number (never the form data)
+      responses:
+        "200": { description: status, content: { application/json: { schema: { $ref: "#/components/schemas/PublicStatus" } } } }
+        "404": { description: unknown }
+        "429": { description: rate limited (20/min per IP) }
+  /api/submissions/{ref}/corrections:
+    parameters: [ { $ref: "#/components/parameters/ref" } ]
+    post:
+      tags: [public]
+      summary: Replace one document while the case is `returned`
+      requestBody: { content: { application/json: { schema: { type: object, required: [field, file], properties: { field: { type: string }, file: { type: string, description: data URI } } } } } }
+      responses:
+        "200": { description: accepted; status goes back to processing }
+        "400": { description: not returned, bad field or rejected file }
+        "429": { description: rate limited (10/min per IP) }
+  /api/admin/login:
+    post:
+      tags: [admin]
+      summary: Staff login (per-person accounts)
+      requestBody: { content: { application/json: { schema: { type: object, required: [username, password], properties: { username: { type: string }, password: { type: string } } } } } }
+      responses:
+        "200": { description: session, content: { application/json: { schema: { type: object, properties: { token: { type: string }, display_name: { type: string }, role: { type: string, enum: [viewer, officer, admin] } } } } } }
+        "401": { description: invalid credentials (same answer for unknown, wrong or deactivated) }
+        "429": { description: too many attempts (5/min per IP, 10/10 min per username) }
+  /api/admin/logout:
+    post:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: End the session
+      responses: { "200": { description: ended } }
+  /api/admin/submissions:
+    get:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Case list (summaries)
+      responses:
+        "200": { description: list, content: { application/json: { schema: { type: object, properties: { submissions: { type: array, items: { $ref: "#/components/schemas/Summary" } } } } } } }
+  /api/admin/submissions/{ref}:
+    parameters: [ { $ref: "#/components/parameters/ref" } ]
+    get:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Full record (audited as view_full)
+      responses:
+        "200": { description: record, content: { application/json: { schema: { $ref: "#/components/schemas/Record" } } } }
+        "404": { description: unknown }
+  /api/admin/submissions/{ref}/attachments/{filename}:
+    parameters:
+      - { $ref: "#/components/parameters/ref" }
+      - { name: filename, in: path, required: true, schema: { type: string } }
+    get:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Download a stored file (audited as attachment_view)
+      responses:
+        "200": { description: the file, content: { image/*: {}, application/pdf: {} } }
+        "404": { description: unknown }
+  /api/admin/submissions/{ref}/status:
+    parameters: [ { $ref: "#/components/parameters/ref" } ]
+    post:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Change the status with a note (officer+)
+      description: The actor is the session's user; `changed_by*` in the body is ignored. Triggers the `status_change` event and the SMS/email notice.
+      requestBody: { content: { application/json: { schema: { type: object, required: [status], properties: { status: { $ref: "#/components/schemas/Status" }, note: { type: string, maxLength: 500 } } } } } }
+      responses:
+        "200": { description: changed }
+        "400": { description: bad status }
+        "403": { description: viewer role }
+  /api/admin/audit:
+    get:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Audit log, newest first (officer+)
+      parameters:
+        - { name: ref, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, maximum: 1000, default: 100 } }
+      responses:
+        "200": { description: rows, content: { application/json: { schema: { type: object, properties: { audit: { type: array, items: { $ref: "#/components/schemas/AuditRow" } } } } } } }
+  /api/admin/export:
+    get:
+      tags: [integration]
+      security: [ { bearer: [] } ]
+      summary: Pull full records, oldest first, for the Court's own system (officer+)
+      description: Page with `since` = the `next_since` of the previous answer. Audited as export.
+      parameters:
+        - { name: since, in: query, schema: { type: integer, description: "submitted_at (ms) after which to start; 0 = from the beginning" } }
+        - { name: limit, in: query, schema: { type: integer, maximum: 500, default: 100 } }
+      responses:
+        "200":
+          description: page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submissions: { type: array, items: { $ref: "#/components/schemas/Record" } }
+                  next_since: { type: integer }
+                  more: { type: boolean }
+  /api/admin/users:
+    get:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Staff accounts (admin role)
+      responses:
+        "200": { description: accounts, content: { application/json: { schema: { type: object, properties: { users: { type: array, items: { $ref: "#/components/schemas/User" } } } } } } }
+        "403": { description: not admin }
+    post:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Create a staff account (admin role; audited as user_create)
+      requestBody: { content: { application/json: { schema: { type: object, required: [username, display_name, role, password], properties: { username: { type: string, pattern: "^[a-z0-9._-]{3,40}$" }, display_name: { type: string, maxLength: 80 }, role: { type: string, enum: [viewer, officer, admin] }, password: { type: string, minLength: 8 } } } } } }
+      responses:
+        "200": { description: created, content: { application/json: { schema: { type: object, properties: { user: { $ref: "#/components/schemas/User" } } } } } }
+        "400": { description: validation ({ error }) }
+        "409": { description: username exists }
+  /api/admin/users/{username}/active:
+    parameters: [ { name: username, in: path, required: true, schema: { type: string } } ]
+    post:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Activate or deactivate (admin role; deactivating ends the account's sessions; audited as user_active)
+      requestBody: { content: { application/json: { schema: { type: object, required: [active], properties: { active: { type: boolean } } } } } }
+      responses:
+        "200": { description: changed }
+        "400": { description: an account cannot deactivate itself }
+        "404": { description: unknown username }
+  /api/admin/users/{username}/password:
+    parameters: [ { name: username, in: path, required: true, schema: { type: string } } ]
+    post:
+      tags: [admin]
+      security: [ { bearer: [] } ]
+      summary: Set a password (admin role; ends the account's sessions; audited as user_password)
+      requestBody: { content: { application/json: { schema: { type: object, required: [password], properties: { password: { type: string, minLength: 8 } } } } } }
+      responses:
+        "200": { description: set }
+        "400": { description: too short }
+        "404": { description: unknown username }
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer }
+  parameters:
+    ref:
+      name: ref
+      in: path
+      required: true
+      schema: { type: string, pattern: "^[A-Z]{2,4}-[A-Z0-9]{4,12}$" }
+      description: reference number, e.g. VK-UV9WB2PQ
+  schemas:
+    Status:
+      type: string
+      enum: [submitted, processing, pending, approved, rejected, returned, completed]
+    DataEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          description: |
+            Every answer keyed by the field key of app/specs/<form>.json (scalars or arrays; keys
+            [A-Za-z0-9_.-], at most 3000 fields, strings at most 20 000 chars). `form_code` names
+            the form; `_step` is the page reached (drafts). Files are data URIs on submit and
+            `@file:<name>` markers in stored records.
+          additionalProperties: true
+    PublicStatus:
+      type: object
+      properties:
+        ref_code: { type: string }
+        status: { $ref: "#/components/schemas/Status" }
+        status_dv: { type: string }
+        submitted_at: { type: integer }
+        form_code: { type: string }
+        history: { type: array, items: { $ref: "#/components/schemas/HistoryEntry" } }
+        attachment_fields: { type: array, items: { type: string }, description: only while status is returned }
+    HistoryEntry:
+      type: object
+      properties:
+        status: { $ref: "#/components/schemas/Status" }
+        status_dv: { type: string }
+        timestamp: { type: integer }
+        note: { type: string }
+        changed_by: { type: integer, description: admin view only }
+        changed_by_name: { type: string, description: admin view only }
+    Summary:
+      type: object
+      properties:
+        ref_code: { type: string }
+        status: { $ref: "#/components/schemas/Status" }
+        status_dv: { type: string }
+        submitted_at: { type: integer }
+        form_code: { type: string }
+        contact_number: { type: string }
+        id_number: { type: string }
+        changed_by_name: { type: string }
+    Record:
+      allOf:
+        - $ref: "#/components/schemas/Summary"
+        - type: object
+          properties:
+            data: { type: object, additionalProperties: true }
+            attachments: { type: array, items: { type: string }, description: file names under FC_UPLOADS_DIR/<ref>/ }
+            history: { type: array, items: { $ref: "#/components/schemas/HistoryEntry" } }
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        display_name: { type: string }
+        role: { type: string, enum: [viewer, officer, admin] }
+        active: { type: boolean }
+        created_at: { type: integer }
+    AuditRow:
+      type: object
+      properties:
+        id: { type: integer }
+        timestamp: { type: integer }
+        action: { type: string, description: "login_ok, login_fail, login_rate_limited, submit, view_full, attachment_view, status_change, correction, export, user_create, user_active, user_password" }
+        actor_user_id: { type: integer, nullable: true }
+        actor_name: { type: string, nullable: true }
+        ref_code: { type: string, nullable: true }
+        ip: { type: string }
+        details: { type: object, additionalProperties: true }
+    Event:
+      type: object
+      description: Body POSTed to FC_EVENT_WEBHOOK on every case change (events.js)
+      properties:
+        id: { type: string, format: uuid }
+        event: { type: string, enum: [submitted, status_change, correction] }
+        at: { type: integer }
+        ref_code: { type: string }
+        form_code: { type: string }
+        status: { $ref: "#/components/schemas/Status" }
+        status_dv: { type: string }
+        actor: { type: object, nullable: true, properties: { id: { type: integer }, name: { type: string } } }
+        record: { $ref: "#/components/schemas/Record" }
+        attachments: { type: array, items: { type: object, properties: { name: { type: string }, path: { type: string } } } }

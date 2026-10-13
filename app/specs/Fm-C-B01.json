@@ -1,0 +1,1234 @@
+{
+ "form_code": "Fm-C-B01",
+ "ref_prefix": "VL",
+ "header": {
+  "court_dv": "ފެމިލީ ކޯޓު",
+  "src": [
+   "b0002",
+   "b0003",
+   "b0006"
+  ],
+  "location_dv": "މާލެ، ދިވެހިރާއްޖެ",
+  "code_dv": "Fm-C-B01"
+ },
+ "title_dv": "ވަލީ ހޯދުމަށް އެދި ހުށަހަޅާ ފޯމު",
+ "src_title": [
+  "b0008"
+ ],
+ "title_en": "Wali (guardianship consent) case form",
+ "steps": [
+  {
+   "step_key": "instructions",
+   "module": "instructions",
+   "fields": [
+    {
+     "type": "instructions_block",
+     "amend": [
+      "2026-09-08-instr-a"
+     ],
+     "title_dv": "ފޯމު ފުރުމަށް ދެވިފައިވާ އިރުޝާދު",
+     "sections": [
+      {
+       "amend": [
+        "2026-09-08-instr-a"
+       ],
+       "heading_dv": "ފޯމު ހުށަހަޅާއިރު ސަމާލުކަން ދޭންވީކަންކަން:",
+       "paragraphs_dv": [
+        "ފޯމާއެކު އަޕްލޯޑް ކުރުމަށް ބުނެފައިވާ ހުރިހާ ލިޔެކިޔުމަކީ ރަނގަޅު ފެންވަރެއްގައި ސްކޭން ކުރެވިފައިވާ ލިޔެކިޔުމަށް ވާންވާނެއެވެ."
+       ]
+      },
+      {
+       "amend": [
+        "2026-09-08-instr-a"
+       ],
+       "heading_dv": "ފޯމު އިސްލާހު ކުރުމާއި ބަލައިގަތުން:",
+       "paragraphs_dv": [
+        "އިސްލާހު ކުރަންޖެހޭ ފޯމެއްނަމަ އިސްލާހު ކުރަން އެންގުމާއި، ބަލައިނުގަނެވޭނެ ފޯމެއްނަމަ ލިޔުމުން އެކަން އެންގުމާއި، މަޢުލޫމާތު ސާފުކުރުމަށްޓަކައި ކޯޓަށް ޙާޟިރުވުމަށް އެންގުމުގެ އިޚްތިޔާރު ކޯޓަށް ލިބިގެންވެއެވެ.",
+        "ފޯމު އިސްލާހު ކުރުމަށް ގިނަވެގެން ދެވޭނީ 3  (ތިނެއް) ދުވަހެވެ.",
+        "އިސްލާހު ކުރުމަށް ދީފައިވާ މުއްދަތުގައި އިސްލާހު ނުކުރާ ފޯމުތައް ބާތިލުކުރުމުގެ އިޚްތިޔާރު ރަޖިސްޓްރާރަށް ލިބިގެންވެއެވެ.",
+        "ރަޖިސްޓްރާރގެ ނިންމުމާމެދު ހިތްހަމަނުޖެހޭނަމަ އަލުން އެ ނިންމުމެއް ބަލައިދިނުމަށް އެދި ކޯޓަށް ހުށަހެޅުމުގެ އިޚްތިޔާރު އެ ނިންމުމަކާ ގުޅުންހުރި ކޮންމެ ފަރާތަކަށް ލިބިގެންވެއެވެ.",
+        "މިގޮތުން ދެވަނަ ފަހަރަށް ބަލައިދިނުމަށް އެދޭނަމަ އެ ނިންމުމެއް ނިންމި ދުވަހުން ފެށިގެން 7  (ހަތެއް) ދުވަހު ތެރޭގައި ހުށަހަޅަންވާނެއެވެ."
+       ]
+      },
+      {
+       "amend": [
+        "2026-09-08-instr-a"
+       ],
+       "heading_dv": "ވަކީލަކު ޢައްޔަނުކުރުން / ބަދަލު ހަމަޖެއްސުން:",
+       "paragraphs_dv": [
+        "ވަކީލަކު ޢައްޔަނުކުރާނަމަ ނުވަތަ ބަދަލުގައި މީހަކު ހަމަޖައްސާނަމަ، ޝަރީޢަތުގެ މަޖިލީސް ފެށުމުގެ 30 މިނިޓް ކުރިން، އެކަމަށް ކަނޑައެޅިފައިވާ ފޯމު ހުށަހަޅަންވާނެއެވެ.",
+        "ބަދަލުގައި ޝަރީއަތުގެ މަޖިލީހަށް ހާޒިރުވެވޭނީ ހާޒިރުވާންޖެހޭ މީހާގެ ގާތްތިމާގެ މީހަކަށެވެ. ނަމަވެސް ގާތްތިމާގެ މީހަކު ހަމަޖެއްސެން ނެތްނަމަ ބަދަލުގައި އެހެން މީހަކު ގަބޫލުކުރުމުގެ އިހުތިޔާރު ކޯޓަށް ލިބެގެންވެއެވެ.",
+        "ބަދަލުގައި ޝަރީއަތަށް ހާޒިރުވާ މީހާއަކީ ޝަރީއަތަށް ބޭނުންވާ މައުލޫމާތު އެނގިހުރި މީހަކަށް ވާންވާނެއެވެ. އެ މީހަކީ އެފަދަ މީހަކަށް ނުވާނަމަ ބަދަލު ބާތިލުކުރުމުގެ އިހުތިޔާރު މައްސަލަ ބަލާ ފަނޑިޔާރަށް ލިބިގެންވެއެވެ.",
+        "ކޯޓުން ކަނޑައަޅާފައިވާ \"ބަދަލު ހަމަޖައްސަން އެދޭ ފޯމު\" ގެ ބަދަލުގައި އެ ފޯމުގައި ހިމެނޭ ހުރިހާ މަޢުލޫމާތެއް ހިމެނޭ ގޮތަށް، ރަޖިސްޓްރީކޮށްފައިވާ ނުވަތަ ނޮޓަރައިޒްކޮށްފައިވާ ނުވަތަ ރާއްޖޭން ބޭރުގައި ނަމަ ރަސްމީ އިދާރާއަކުން ތައްގަނޑު ޖަހާފައިވާ ޕަވަރ އޮފް އެޓަރނީއެއް ހުށަހެޅިދާނެއެވެ."
+       ]
+      },
+      {
+       "amend": [
+        "2026-09-08-instr-a"
+       ],
+       "heading_dv": "ޝަރީއަތުގެ މަޖިލިސް އަޑުއެހުން:",
+       "paragraphs_dv": [
+        "ޢާއިލީ މައްސަލަތައް އަޑުއެހުމަށް އެދޭ ފަރާތްތަކަކީ ޚަޞްމުންނާއި ގުޅުންހުރި ފަރާތްތަކެއް ކަމުގައިވާނަމަ އެކަމަށް ކަނޑައަޅާފައިވާ ފޯމު ފުރިހަމަ ކުރުމަށްފަހު ޝަރީޢަތުގެ މަޖިލިސް ބޭއްވުމަށް ކަނޑައެޅިފައިވާ ވަގުތުގެ 15 (ފަނަރަ) މިނިޓް ކުރިން ކޯޓަށް ހުށަހަޅަންވާނެއެވެ.",
+        "ދެމަފިރިންގެ ޒާތީ މަޢުލޫމާތު ނުވަތަ ކުޑަކުދިންނާ ގުޅުންހުރި މައްސަލަތަކުގައި ޝަރީޢަތުގެ މަޖިލީސް އަޑުއެހުމުގެ ފުރުޞަތު ދެވޭނީ މައްސަލައިގައި ޝާމިލުވާ ފަރާތްތަކުގެ ރުހުމާއެކު މައްސަލަ ބައްލަވާ ޤާޟީ އެކަމަށް ހުއްދަ ދެއްވުމުންނެވެ."
+       ]
+      },
+      {
+       "amend": [
+        "2026-09-08-instr-a"
+       ],
+       "heading_dv": "ހިނގަމުންދާ މައްސަލައަށް ތަދައްޚުލުވުން (ވަނުން):",
+       "paragraphs_dv": [
+        "ހިނގަމުންދާ މައްސަލައަކަށް ތަދައްޚުލުވާން އެދޭނީ އެކަމަށް ކަނޑައަޅާފައިވާ ފޯމުންނެވެ.",
+        "ތަދައްޚުލުވާން އެދޭ ފަރާތުގެ މަސްލަހަތު ހިމެނޭކަމަށް ކޯޓުން ނިންމައިފިނަމަ، މައްސަލާގައި ބައިވެރިވެ، މައްސަލައާ ގުޅިގެން ވާހަކަ ދެއްކުމާއި، ލިޔެކިޔުން ހުށަހެޅުމުގެ ފުރުޞަތު އެފަރާތަކަށް ލިބިގެންވެއެވެ."
+       ]
+      }
+     ]
+    }
+   ],
+   "amend": [
+    "2026-09-07-p18-a"
+   ]
+  },
+  {
+   "step_key": "submitting_party",
+   "type": "submitting_party",
+   "question_dv": "ފޯމު ހުށަހަޅަނީ ކާކު؟",
+   "options": [
+    {
+     "value": "party",
+     "label_dv": "އަމިއްލައަށް",
+     "amend": [
+      "2026-09-01-p11-c"
+     ]
+    },
+    {
+     "value": "poa",
+     "label_dv": "އެހެން ފަރާތެއް މެދުވެރިކޮށް",
+     "amend": [
+      "2026-09-01-p11-c",
+      "2026-09-07-p02-a"
+     ]
+    }
+   ],
+   "fc_notes": [
+    {
+     "id": "1",
+     "text": "މި އޮޕްޝަން ސެލެކްޓްކޮށްފިނަމަ ޕަވަރ އޮފް އެޓާރނީއާއި ޕަވަރ އޮފް އެޓާރނީ ޙަވާލުކުރާ ފަރާތާއި ޙަވާލުވާ ފަރާތުގެ ކާކުކަން އަންގައިދޭ ކާޑުގެ ކޮޕީ އަޕްލޯޑް ކުރަންޖެހޭ ގޮތަށް ޑިޒައިން ކުރުމަށް"
+    }
+   ],
+   "amend": [
+    "2026-09-01-p11-a",
+    "2026-09-01-p11-b",
+    "2026-09-01-p11-c",
+    "2026-09-07-p02-a"
+   ]
+  },
+  {
+   "step_key": "applicant",
+   "title_dv": "މައްސަލަ ހުށަހަޅާ ފަރާތުގެ މަޢުލޫމާތު:",
+   "src_title": "b0020",
+   "fc_notes": [
+    {
+     "id": "2",
+     "text": "ފޯމުގެ 01 ވަނަ ނަންބަރާއި 02 ވަނަ ނަންބަރުގައިވާ މަޢުލޫމާތު ފުރިހަމަ ކުރަންވާނީ އައިޑީކާޑުގައިވާ ގޮތަށްކަން އެނގޭނެ ނޮޓިފިކޭޝަނެއް ފެންނަންވާނެ"
+    }
+   ],
+   "module": "applicant",
+   "fields": [
+    {
+     "type": "text",
+     "src": [
+      "b0026",
+      "b0027"
+     ],
+     "label_dv": "ފުރިހަމަނަން:",
+     "key": "applicant_full_name",
+     "number": "1.1",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "module_field": "full_name"
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0024"
+     ],
+     "label_dv": "އައިޑީ ކާޑު ނަންބަރު (ބިދޭސީއެއްނަމަ ޕާސްޕޯޓު ނަންބަރ):",
+     "key": "applicant_id_number",
+     "validation": {
+      "required": true,
+      "format": "id_card",
+      "pattern": "^(A[0-9]{6}|[A-Za-z0-9]{6,12})$"
+     },
+     "module_field": "id_number"
+    },
+    {
+     "key": "applicant_birth_certificate",
+     "type": "file_attachment",
+     "label_dv": "ހުށަހަޅާ ފަރާތުގެ އުފަންދުވަހުގެ ސެޓްފިކެޓުގެ ކޮޕީ",
+     "src": [
+      "b0247"
+     ],
+     "accept": "image/*,.pdf",
+     "amend": [
+      "2026-09-07-p10-b01-abirth"
+     ],
+     "validation": {
+      "required": true
+     }
+    },
+    {
+     "key": "applicant_id_document",
+     "type": "file_attachment",
+     "label_dv": "ދިވެހި ރައްޔިތެއްކަން އަންގައިދޭ ކާޑު އެޓޭޗް ކުރައްވާ",
+     "accept": "image/*,.pdf",
+     "amend": [
+      "2026-09-07-p10-b01-id",
+      "2026-09-09-day4-label-id-document"
+     ],
+     "validation": {
+      "required": true
+     }
+    },
+    {
+     "type": "tel",
+     "src": [
+      "b0033",
+      "b0034"
+     ],
+     "label_dv": "ފޯނު ނަންބަރު:",
+     "key": "applicant_phone",
+     "number": "1.2",
+     "validation": {
+      "required": true,
+      "pattern": "^[0-9]{7,15}$"
+     },
+     "module_field": "phone"
+    },
+    {
+     "type": "date",
+     "src": [
+      "b0037"
+     ],
+     "label_dv": "އުފަން ތާރީޚް:",
+     "key": "applicant_dob",
+     "validation": {
+      "required": true,
+      "min_age": 18
+     },
+     "constraint": "past_only",
+     "module_field": "dob"
+    },
+    {
+     "type": "derived_age",
+     "src": [
+      "b0040"
+     ],
+     "label_dv": "ޢުމުރު:",
+     "key": "applicant_age",
+     "from_field": "applicant_dob",
+     "module_field": "age",
+     "fc_notes": [
+      {
+       "id": "3",
+       "text": "އުފަންތާރީޚު ޖެހުމުން އޮޓޯއިން އުމުރު އަރާގޮތަށް"
+      }
+     ]
+    },
+    {
+     "type": "address",
+     "src": [
+      "b0043",
+      "b0044"
+     ],
+     "label_dv": "ދާއިމީ އެޑްރެސް (އަތޮޅާއި ރަށާއެކު):",
+     "key": "applicant_permanent_address",
+     "number": "1.3",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "module_field": "permanent_address",
+     "amend": [
+      "2026-09-07-p07-req-applicant_permanent_address",
+      "2026-09-07-p06-addr-applicant_permanent_address"
+     ]
+    },
+    {
+     "type": "address",
+     "src": [
+      "b0047",
+      "b0048"
+     ],
+     "label_dv": "މިހާރު ދިރިއުޅޭ އެޑްރެސް:",
+     "key": "applicant_current_address",
+     "number": "1.4",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "module_field": "current_address",
+     "fc_notes": [
+      {
+       "id": "4",
+       "text": "1.3 ނުވަތަ 1.4 ގައި މާލޭގެ އެޑްރެހެއް އޮންނަންވަނެ"
+      }
+     ],
+     "review_flag": "FC comment: 1.3 or 1.4 must contain a Malé address — automatic check needs a structured address or Court guidance",
+     "amend": [
+      "2026-09-07-p07-req-applicant_current_address",
+      "2026-09-07-p06-addr-applicant_current_address"
+     ]
+    },
+    {
+     "type": "radio",
+     "src": [
+      "b0051"
+     ],
+     "label_dv": "ކޯޓަށް ޙާޟިރުވުމުގެ އަމުރު ފޮނުވަން އެދެނީ:-",
+     "key": "applicant_service_preference",
+     "number": "1.5",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "module_field": "service_preference",
+     "fc_notes": [
+      {
+       "id": "5",
+       "text": "ޗިޓު ފޮނުވާ އެޑްރެހަކީ މާލޭގެ އެޑްރެހަކަށް ވާންވާނެ"
+      }
+     ],
+     "review_flag": "FC comment: summons (chit) address must be a Malé address",
+     "options": [
+      {
+       "value": "viber",
+       "label_dv": "ވައިބަރ މެދުވެރިކޮށް",
+       "amend": [
+        "2026-09-02-p06-a"
+       ]
+      },
+      {
+       "value": "email",
+       "label_dv": "އީމެއިލް މެދުވެރިކޮށް",
+       "amend": [
+        "2026-09-02-p06-a"
+       ]
+      },
+      {
+       "value": "current_address",
+       "label_dv": "މިހާރު ދިރިއުޅޭ އެޑްރެހަށް",
+       "amend": [
+        "2026-09-02-p06-a"
+       ]
+      }
+     ],
+     "amend": [
+      "2026-09-02-p06-a"
+     ]
+    },
+    {
+     "key": "applicant_email",
+     "type": "email",
+     "amend": [
+      "2026-09-07-p07-email-b01"
+     ],
+     "label_dv": "އީމެއިލް އެޑްރެސް:-",
+     "number": "1.5.2",
+     "visible_when": {
+      "field": "applicant_service_preference",
+      "op": "eq",
+      "value": "email"
+     },
+     "validation": {
+      "required": true
+     }
+    },
+    {
+     "key": "applicant_viber_number",
+     "type": "tel",
+     "amend": [
+      "2026-09-07-p07-a"
+     ],
+     "label_dv": "ވައިބަރ ނަންބަރު",
+     "number": "1.5.1",
+     "visible_when": {
+      "field": "applicant_service_preference",
+      "op": "eq",
+      "value": "viber"
+     },
+     "validation": {
+      "required": true
+     }
+    },
+    {
+     "key": "applicant_workplace",
+     "type": "text",
+     "label_dv": "ވަޒީފާ އަދާކުރާ ތަން",
+     "amend": [
+      "2026-09-07-p07-ajob"
+     ],
+     "number": "1.6.1",
+     "module_field": "workplace",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     }
+    },
+    {
+     "key": "applicant_position",
+     "type": "text",
+     "label_dv": "މަޤާމް",
+     "amend": [
+      "2026-09-07-p07-ajob"
+     ],
+     "number": "1.6.2",
+     "module_field": "position",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     }
+    },
+    {
+     "key": "applicant_monthly_income",
+     "type": "text",
+     "label_dv": "މަހަކު ލިބޭ ޢާމްދަނީ",
+     "amend": [
+      "2026-09-07-p07-ajob",
+      "2026-09-09-day4-income-numbers-only"
+     ],
+     "number": "1.6.3",
+     "module_field": "monthly_income",
+     "validation": {
+      "required": true,
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$"
+     }
+    }
+   ]
+  },
+  {
+   "step_key": "respondent",
+   "title_dv": "މައްސަލަ ރައްދުވާ ފަރާތުގެ މަޢުލޫމާތު:",
+   "src_title": "b0070",
+   "module": "respondent",
+   "fields": [
+    {
+     "type": "text",
+     "src": [
+      "b0076",
+      "b0077"
+     ],
+     "label_dv": "ފުރިހަމަނަން:",
+     "key": "respondent_full_name",
+     "number": "2.1",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "module_field": "full_name"
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0074"
+     ],
+     "label_dv": "އައިޑީ ކާޑު ނަންބަރު (ބިދޭސީއެއްނަމަ ޕާސްޕޯޓު ނަންބަރ):",
+     "key": "respondent_id_number",
+     "validation": {
+      "format": "id_card",
+      "pattern": "^(A[0-9]{6}|[A-Za-z0-9]{6,12})$",
+      "not_equal_field": "applicant_id_number",
+      "required": true
+     },
+     "module_field": "id_number",
+     "amend": [
+      "2026-10-01-day6-respondent-id-required"
+     ]
+    },
+    {
+     "type": "tel",
+     "src": [
+      "b0083",
+      "b0084"
+     ],
+     "label_dv": "ފޯނު ނަންބަރު:",
+     "key": "respondent_phone",
+     "number": "2.2",
+     "module_field": "phone",
+     "validation": {
+      "pattern": "^[0-9]{7,15}$",
+      "required": true
+     },
+     "amend": [
+      "2026-10-01-day6-respondent-phone-required"
+     ]
+    },
+    {
+     "type": "date",
+     "src": [
+      "b0087"
+     ],
+     "label_dv": "އުފަން ތާރީޚް:",
+     "key": "respondent_dob",
+     "constraint": "past_only",
+     "module_field": "dob",
+     "validation": {
+      "min_age": 18
+     }
+    },
+    {
+     "type": "derived_age",
+     "src": [
+      "b0090"
+     ],
+     "label_dv": "ޢުމުރު:",
+     "key": "respondent_age",
+     "from_field": "respondent_dob",
+     "module_field": "age",
+     "fc_notes": [
+      {
+       "id": "6",
+       "text": "އުފަންތާރީޚު ޖެހުމުން އޮޓޯއިން އުމުރު އަރާގޮތަށް"
+      }
+     ]
+    },
+    {
+     "type": "address",
+     "src": [
+      "b0093",
+      "b0094"
+     ],
+     "label_dv": "ދާއިމީ އެޑްރެސް (އަތޮޅާއި ރަށާއެކު):",
+     "key": "respondent_permanent_address",
+     "number": "2.3",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "module_field": "permanent_address",
+     "amend": [
+      "2026-09-07-p07-req-respondent_permanent_address",
+      "2026-09-07-p06-addr-respondent_permanent_address"
+     ]
+    },
+    {
+     "type": "address",
+     "src": [
+      "b0097",
+      "b0098"
+     ],
+     "label_dv": "މިހާރު ދިރިއުޅޭ އެޑްރެސް:",
+     "key": "respondent_current_address",
+     "number": "2.4",
+     "module_field": "current_address",
+     "validation": {
+      "script": "thaana",
+      "required": true
+     },
+     "amend": [
+      "2026-09-07-p07-req-respondent_current_address",
+      "2026-09-07-p06-addr-respondent_current_address"
+     ]
+    },
+    {
+     "key": "respondent_workplace",
+     "type": "text",
+     "label_dv": "ވަޒީފާ އަދާކުރާ ތަން",
+     "amend": [
+      "2026-09-07-p07-rjob"
+     ],
+     "number": "2.6.1",
+     "module_field": "workplace",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     }
+    },
+    {
+     "key": "respondent_position",
+     "type": "text",
+     "label_dv": "މަޤާމް",
+     "amend": [
+      "2026-09-07-p07-rjob"
+     ],
+     "number": "2.6.2",
+     "module_field": "position",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     }
+    },
+    {
+     "key": "respondent_monthly_income",
+     "type": "text",
+     "label_dv": "މަހަކު ލިބޭ ޢާމްދަނީ",
+     "amend": [
+      "2026-09-07-p07-rjob",
+      "2026-09-09-day4-income-numbers-only"
+     ],
+     "number": "2.6.3",
+     "module_field": "monthly_income",
+     "validation": {
+      "required": true,
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$"
+     }
+    }
+   ]
+  },
+  {
+   "step_key": "court_use",
+   "title_dv": "ކޯޓުގެ ބޭނުމަށް",
+   "src_title": "b0120",
+   "fc_notes": [
+    {
+     "id": "7",
+     "text": "މި ސެކްޝަން އެއްވެސް ގޮތަކަށް ޕަބްލިކަށް  ނުފެންނަ ގޮތަށް ބަދަލު ކުރުމަށް. ނަމަވެސް ކޯޓުން ވިއު ކުރާއިރު ކޯޓަށް މި ސެކްޝަން ފެންނަންވާނެ"
+    }
+   ],
+   "audience": "staff_only",
+   "fields": [
+    {
+     "type": "court_use_block",
+     "title_dv": "ކޯޓުގެ ބޭނުމަށް",
+     "src_title": [
+      "b0120"
+     ],
+     "fields_dv": [
+      "އެންޓްރީ:",
+      "ފޯމު ޗެކްކުރީ:",
+      "ޤަޟިއްޔާ ނަންބަރު:_______/ Fm-C/ ______",
+      "ކުރީގެ ރެކޯޑު:",
+      "ރަޖިސްޓްރީ ކުރެވުނު ތާރީޚް:",
+      "ރަޖިސްޓްރާގެ ނިންމުން:",
+      "މައްސަލަ ބެލުމަށް ކަނޑައެޅުނު ސެކްޝަން:",
+      "ފޯމް ހިފައިގެން އައި ފަރާތުގެ ނަން:",
+      "ދާއިމީ އެޑްރެސް:",
+      "އައިޑީކާޑު ނަންބަރު:",
+      "ފޯނު ނަންބަރު:"
+     ],
+     "src": [
+      "b0121",
+      "b0126",
+      "b0128",
+      "b0130",
+      "b0132",
+      "b0135",
+      "b0139",
+      "b0141",
+      "b0143",
+      "b0145",
+      "b0146"
+     ],
+     "fc_notes": [
+      {
+       "id": "7",
+       "text": "މި ސެކްޝަން އެއްވެސް ގޮތަކަށް ޕަބްލިކަށް  ނުފެންނަ ގޮތަށް ބަދަލު ކުރުމަށް. ނަމަވެސް ކޯޓުން ވިއު ކުރާއިރު ކޯޓަށް މި ސެކްޝަން ފެންނަންވާނެ"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "step_key": "marriage_info",
+   "title_dv": "މައްސަލަ ހުށަހަޅާ ފަރާތުގެ ކައިވެނީގެ މަޢުލޫމާތު: (ބޭނުންވާ ގޮޅީގައި މި ފާހަގަ: ޖެހާށެވެ)",
+   "src_title": "b0148",
+   "module": "marriage_info",
+   "fields": [
+    {
+     "type": "radio",
+     "options": [
+      {
+       "value": "married",
+       "label_dv": "ކާވެނިކުރިން",
+       "src": [
+        "b0154"
+       ]
+      },
+      {
+       "value": "not_married",
+       "label_dv": "ކާވެނިނުކުރުން",
+       "src": [
+        "b0158"
+       ]
+      }
+     ],
+     "src": [
+      "b0149",
+      "b0150",
+      "b0154",
+      "b0158"
+     ],
+     "label_dv": "މީގެ ކުރިން ކާވެންޏެއް ކޮށްފައިވޭތޯ",
+     "key": "married_before",
+     "number": "3.1",
+     "validation": {
+      "required": true
+     }
+    },
+    {
+     "type": "radio",
+     "options": [
+      {
+       "value": "yes",
+       "label_dv": "ހުށަހެޅިން",
+       "src": [
+        "b0156"
+       ]
+      },
+      {
+       "value": "no",
+       "label_dv": "ހުށައެއްނާޅަން",
+       "src": [
+        "b0160"
+       ]
+      }
+     ],
+     "src": [
+      "b0151",
+      "b0152",
+      "b0156",
+      "b0160"
+     ],
+     "label_dv": "ވަލީ ނުދީގެން މީގެކުރިން މައްސަލައެއް ހުށަހެޅުންތޯ",
+     "key": "prev_wali_case",
+     "number": "3.2",
+     "validation": {
+      "required": true
+     }
+    },
+    {
+     "key": "prior_wali_case_report",
+     "type": "file_attachment",
+     "label_dv": "ކުރީގައި މިފަދަ މައްސަލައެއް ހުށަހަޅާ ނިމިފައިވާނަމަ، ނިމުނު ގޮތުގެ ރިޕޯޓުގެ ކޮޕީ ނުވަތަ ޚުލާސާ ރިޕޯޓުގެ ކޮޕީ.",
+     "src": [
+      "b0249"
+     ],
+     "accept": "image/*,.pdf",
+     "amend": [
+      "2026-09-07-p10-att-b0249-b01"
+     ],
+     "validation": {
+      "required": true
+     },
+     "visible_when": {
+      "field": "prev_wali_case",
+      "op": "eq",
+      "value": "yes"
+     }
+    }
+   ]
+  },
+  {
+   "step_key": "person_to_marry",
+   "title_dv": "އެމީހަކާ ކާވެނިކުރުމަށް ބޭނުންވާ މީހާގެ މަޢުލޫމާތު:",
+   "src_title": "b0162",
+   "fields": [
+    {
+     "type": "text",
+     "src": [
+      "b0168",
+      "b0169"
+     ],
+     "label_dv": "ފުރިހަމަ ނަން",
+     "key": "ptm_full_name",
+     "number": "4.1",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     }
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0172"
+     ],
+     "label_dv": "އައިޑީ ކާޑު ނަންބަރު (ބިދޭސީއެއްނަމަ ޕާސްޕޯޓު ނަންބަރ):",
+     "key": "ptm_id_number",
+     "validation": {
+      "format": "id_card",
+      "pattern": "^(A[0-9]{6}|[A-Za-z0-9]{6,12})$",
+      "not_equal_field": "applicant_id_number"
+     }
+    },
+    {
+     "type": "tel",
+     "src": [
+      "b0175",
+      "b0176"
+     ],
+     "label_dv": "ފޯނު ނަންބަރު:",
+     "key": "ptm_phone",
+     "number": "4.2",
+     "validation": {
+      "pattern": "^[0-9]{7,15}$"
+     }
+    },
+    {
+     "type": "date",
+     "src": [
+      "b0179"
+     ],
+     "label_dv": "އުފަން ތާރީޚް:",
+     "key": "ptm_dob",
+     "constraint": "past_only",
+     "validation": {
+      "min_age": 18
+     },
+     "fc_notes": [
+      {
+       "id": "9",
+       "text": "އުފަން ތާރީޚު ލިޔެވުނީމައި އުމުރު އޮޓޯއިން ލިޔެވޭގޮތަށް"
+      }
+     ]
+    },
+    {
+     "type": "derived_age",
+     "src": [
+      "b0182"
+     ],
+     "label_dv": "ޢުމުރު:",
+     "key": "ptm_age",
+     "from_field": "ptm_dob"
+    },
+    {
+     "type": "address",
+     "src": [
+      "b0185",
+      "b0186"
+     ],
+     "label_dv": "ދާއިމީ އެޑްރެސް (އަތޮޅާއި ރަށާއެކު):",
+     "key": "ptm_permanent_address",
+     "number": "4.3",
+     "validation": {
+      "script": "thaana"
+     },
+     "amend": [
+      "2026-09-07-p06-addr2-ptm_permanent_address"
+     ]
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0189",
+      "b0190"
+     ],
+     "label_dv": "ވަޒީފާ އަދާކުރާ ތަން :",
+     "key": "ptm_workplace",
+     "number": "4.4.1",
+     "validation": {
+      "script": "thaana"
+     },
+     "amend": [
+      "2026-09-09-day4-num-b01-ptm-workplace"
+     ]
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0194"
+     ],
+     "label_dv": "މަޤާމް:",
+     "key": "ptm_position",
+     "validation": {
+      "script": "thaana"
+     },
+     "number": "4.4.2",
+     "amend": [
+      "2026-09-09-day4-num-b01-ptm-position"
+     ]
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0198"
+     ],
+     "label_dv": "ޢާމްދަނީ:",
+     "key": "ptm_income",
+     "validation": {
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$"
+     },
+     "number": "4.4.3",
+     "amend": [
+      "2026-09-09-day4-num-b01-ptm-income",
+      "2026-09-09-day4-income-numbers-only"
+     ]
+    },
+    {
+     "type": "radio",
+     "options": [
+      {
+       "value": "yes",
+       "label_dv": "އާނއެކޭ",
+       "amend": [
+        "2026-10-01-day6-yes"
+       ]
+      },
+      {
+       "value": "no",
+       "label_dv": "ނޫނެކޭ",
+       "amend": [
+        "2026-10-01-day6-no"
+       ]
+      }
+     ],
+     "src": [
+      "b0201",
+      "b0202"
+     ],
+     "label_dv": "މީގެ ކުރިން ކާވެންޏެއް / ކާވެނިތަކެއް ކޮށްފައިވޭތޯ؟",
+     "key": "ptm_prev_marriage",
+     "number": "4.5",
+     "validation": {
+      "required": true
+     },
+     "fc_notes": [
+      {
+       "id": "10",
+       "text": "މި ސުވާލުގެ ޖަވާބުގައި އާއެކޭ ބުނެފިނަމަ 4.6 އާއި 4.7 ފުރިހަމަ ކުރަން ޖެހޭ ގޮތަށް"
+      }
+     ],
+     "amend": [
+      "2026-10-01-day6-yes",
+      "2026-10-01-day6-no"
+     ]
+    },
+    {
+     "type": "number",
+     "src": [
+      "b0212",
+      "b0213"
+     ],
+     "label_dv": "ކާވެނީގެ ވަނަ",
+     "key": "ptm_marriage_number",
+     "number": "4.6",
+     "validation": {
+      "required": true,
+      "min": 2
+     },
+     "visible_when": {
+      "field": "ptm_prev_marriage",
+      "op": "eq",
+      "value": "yes"
+     }
+    },
+    {
+     "type": "radio",
+     "options": [
+      {
+       "value": "yes",
+       "label_dv": "އާނއެކޭ",
+       "amend": [
+        "2026-10-01-day6-yes"
+       ]
+      },
+      {
+       "value": "no",
+       "label_dv": "ނޫނެކޭ",
+       "amend": [
+        "2026-10-01-day6-no"
+       ]
+      }
+     ],
+     "src": [
+      "b0219",
+      "b0220"
+     ],
+     "label_dv": "ކުދިން ލިބިފައިވޭތޯ؟",
+     "key": "ptm_has_children",
+     "number": "4.7",
+     "validation": {
+      "required": true
+     },
+     "fc_notes": [
+      {
+       "id": "12",
+       "text": "މި ސުވާލަށް އާއެކޭ ބުނާނަމަ 4.8 އަދި 4.9 ފުރިހަމަ ކުރުމަށް"
+      }
+     ],
+     "amend": [
+      "2026-10-01-day6-yes",
+      "2026-10-01-day6-no"
+     ]
+    },
+    {
+     "type": "number",
+     "src": [
+      "b0203",
+      "b0204"
+     ],
+     "label_dv": "ކުދިންގެ ޢަދަދު",
+     "key": "ptm_children_count",
+     "number": "4.8",
+     "validation": {
+      "required": true,
+      "min": 1,
+      "step": 1
+     },
+     "visible_when": {
+      "field": "ptm_has_children",
+      "op": "eq",
+      "value": "yes"
+     },
+     "fc_notes": [
+      {
+       "id": "11",
+       "text": "ކުދިންގެ އަދަދުގައި ހިސާބު އަދަދު އެކަނި ލިޔެވޭގޮތަށް"
+      }
+     ]
+    },
+    {
+     "type": "radio",
+     "options": [
+      {
+       "value": "yes",
+       "label_dv": "އާނއެކޭ",
+       "amend": [
+        "2026-10-01-day6-yes"
+       ]
+      },
+      {
+       "value": "no",
+       "label_dv": "ނޫނެކޭ",
+       "amend": [
+        "2026-10-01-day6-no"
+       ]
+      }
+     ],
+     "src": [
+      "b0210",
+      "b0211"
+     ],
+     "label_dv": "ކުދިންގެ ޚަރަދު ސާބިތުވެފައިވޭތޯ؟",
+     "key": "ptm_children_maintenance_proven",
+     "number": "4.9",
+     "visible_when": {
+      "field": "ptm_has_children",
+      "op": "eq",
+      "value": "yes"
+     },
+     "validation": {
+      "required": true
+     },
+     "amend": [
+      "2026-09-07-p11-req-ptm_children_maintenance_proven-b01",
+      "2026-10-01-day6-yes",
+      "2026-10-01-day6-no"
+     ]
+    }
+   ]
+  },
+  {
+   "step_key": "statements",
+   "module": "narratives",
+   "fields": [
+    {
+     "type": "textarea",
+     "src": [
+      "b0229"
+     ],
+     "label_dv": "ވަލީވެރިޔާ ވަލީ ދިނުމަށް ދެކޮޅުހަދާކަމަށް ބުނާ ސަބަބުތައް:",
+     "key": "wali_refusal_reasons",
+     "validation": {
+      "required": true,
+      "maxlength": 200,
+      "script": "thaana"
+     },
+     "maxlength": 200,
+     "fc_notes": [
+      {
+       "id": "13",
+       "text": "މި ބައިގައި 200 ކެރެކްޓަރ އަށްވުރެ ގިނައިން ނުލިޔެވޭނެކަމަށް ނޮޓިފިކޭޝަންއެއް ފެންނަންވާނެ. އިތުރަށް ލިޔަން ބޭނުންވާނަމަ އެހެން ކަރުދާހެއްގައި ލިޔެފައި ވާޑް ފައިލް އަޕްލޯޑް ކުރެވޭ ގޮތަށް ފީލްޑެއް އިންނަންވާނެ"
+      }
+     ],
+     "amend": [
+      "2026-09-09-s4-hint",
+      "2026-09-09-s4-accept",
+      "2026-09-09-day4-overflow-to-textarea"
+     ]
+    },
+    {
+     "type": "textarea",
+     "src": [
+      "b0233"
+     ],
+     "label_dv": "އެ ސަބަބުތަކަށް ރައްދުދޭ ގޮތް:",
+     "key": "refusal_rebuttal",
+     "validation": {
+      "required": true,
+      "maxlength": 150,
+      "script": "thaana"
+     },
+     "maxlength": 150,
+     "fc_notes": [
+      {
+       "id": "14",
+       "text": "މި ބައިގައި 150 ކެރެކްޓަރ އަށްވުރެ ގިނައިން ނުލިޔެވޭނެކަމަށް ނޮޓިފިކޭޝަންއެއް ފެންނަންވާނެ. އިތުރަށް ލިޔަން ބޭނުންވާނަމަ އެހެން ކަރުދާހެއްގައި ލިޔެފައި ވާޑް ފައިލް އަޕްލޯޑް ކުރެވޭ ގޮތަށް ފީލްޑެއް އިންނަންވާނެ"
+      }
+     ],
+     "amend": [
+      "2026-09-09-s4-hint",
+      "2026-09-09-s4-accept",
+      "2026-09-09-day4-overflow-to-textarea"
+     ]
+    },
+    {
+     "key": "additional_writing_wanted",
+     "type": "checkbox",
+     "amend": [
+      "2026-10-01-day6-aw-check-b01"
+     ],
+     "options": [
+      {
+       "value": "yes",
+       "label_dv": "އިތުރަށް ލިޔުއްވަން ބޭނުންވާނަމަ",
+       "amend": [
+        "2026-10-01-day6-aw-check-b01"
+       ]
+      }
+     ]
+    },
+    {
+     "key": "additional_writing",
+     "type": "textarea",
+     "amend": [
+      "2026-09-09-day4-additional-writing-page",
+      "2026-10-01-day6-aw-move-b01",
+      "2026-10-01-day6-aw-10000-b01"
+     ],
+     "label_dv": "އިތުރަށް ލިޔުން",
+     "rows": 14,
+     "maxlength": 10000,
+     "validation": {
+      "script": "thaana",
+      "maxlength": 10000
+     },
+     "visible_when": {
+      "field": "additional_writing_wanted",
+      "op": "in",
+      "values": [
+       "yes"
+      ]
+     }
+    }
+   ],
+   "amend": [
+    "2026-10-01-day6-aw-move-b01"
+   ]
+  },
+  {
+   "step_key": "declaration",
+   "type": "declaration",
+   "declaration_lines_dv": [
+    "މިފޯމު ފުރުމުގައި ދީފައިވާ މައުލޫމާތަކީ، ތެދު މަޢުލޫމާތެއް ކަމަށް އިޤްރާރުވަމެވެ."
+   ],
+   "src_iqraar": [
+    "b0237"
+   ],
+   "name_label_dv": "ހުށަހަޅާފަރާތުގެ ނަން:",
+   "src": [
+    "b0238",
+    "b0240",
+    "b0242"
+   ],
+   "sign_label_dv": "ސޮއި:",
+   "date_label_dv": "ތާރީޚް:",
+   "include_sms_phone": true,
+   "fc_notes": [
+    {
+     "id": "15",
+     "text": "އޮޓޯ އިން މައްސަލަ ހުށަހަޅާ ފަރާތުގެ ނަން ފެންނަންވާނެ މިބައިން. ޕަވަރ އޮފް އެޓާރނީއެއް މެދުވެރިކޮށް ފޯމު ފުރިހަމަ ކުރާނަމަ އެޓާނީގެ ނަން މިބައިން ފެންނަން ވާނެ."
+    },
+    {
+     "id": "16",
+     "text": "ސްކްރީނުގައި ސޮއި ކުރަންޖެހޭ ގޮތަށް ބަދަލު ކުރުމަށް"
+    },
+    {
+     "id": "17",
+     "text": "ފޯމު ފުރިހަމަ ކުރާ ތާރީޚުގެ ބެކްޑޭޓަށް ކަލަންޑަރުން ސެލެކްޓް ނުކުރެވޭ ގޮތަށް ބަދަލު ކުރުމަށް."
+    }
+   ]
+  },
+  {
+   "step_key": "attachments",
+   "module": "attachments",
+   "fields": [
+    {
+     "type": "attachments_checklist",
+     "key": "attachments",
+     "title_dv": "ފޯމާއެކު ހުށަހަޅަންޖެހޭ ތަކެތި ހަމައަށް ހުރިކަން ޔަޤީންކުރެއްވުމަށް މި ފާހަގަ ޖަހާށެވެ!",
+     "items_dv": [],
+     "src": [
+      "b0245",
+      "b0251"
+     ],
+     "footnote_dv": "މައްސަލަ ހުށަހަޅާ މީހާ ނޫން އެހެން މީހަކު މި މައްސަލައިގެ ފޯމު ކޯޓަށް ހިފައިގެން އަންނަ ނަމަ އަންނަންވާނީ އައިޑީކާޑު ނުވަތަ އެމީހަކީ ކާކުކަން އެނގޭނެ ރަސްމީ ލިޔުމެއް ހިފައިގެންނެވެ.",
+     "amend": [
+      "2026-09-07-p10-poa-line"
+     ]
+    }
+   ]
+  },
+  {
+   "step_key": "review",
+   "type": "review"
+  }
+ ],
+ "source": {
+  "file": "Fm-C-B01_Valee-massala-form-v1-2024 (1).docx",
+  "sha256": "355986c18888e3d06470519deafeb7cc28601fb824aba1b7ecd82dfe9e4053d9"
+ },
+ "amend": [
+  "2026-09-01-p10-a"
+ ],
+ "amendments_applied": [
+  "2026-09-01-p11-a",
+  "2026-09-01-p11-b",
+  "2026-09-01-p11-c",
+  "2026-09-01-p10-a",
+  "2026-09-02-p06-a",
+  "2026-09-02-p07-a",
+  "2026-09-02-p07-c",
+  "2026-09-02-p09-a",
+  "2026-09-02-p09-b",
+  "2026-09-02-p09-d",
+  "2026-09-07-p02-a",
+  "2026-09-07-p07-a",
+  "2026-09-07-p07-ajob",
+  "2026-09-07-p07-req-applicant_permanent_address",
+  "2026-09-07-p07-req-applicant_current_address",
+  "2026-09-07-p06-addr-applicant_permanent_address",
+  "2026-09-07-p06-addr-applicant_current_address",
+  "2026-09-07-p07-rjob",
+  "2026-09-07-p07-req-respondent_permanent_address",
+  "2026-09-07-p07-req-respondent_current_address",
+  "2026-09-07-p06-addr-respondent_permanent_address",
+  "2026-09-07-p06-addr-respondent_current_address",
+  "2026-09-07-p18-a",
+  "2026-09-07-p10-poa-line",
+  "2026-09-07-p06-addr2-ptm_permanent_address",
+  "2026-09-08-instr-a",
+  "2026-09-09-s4-hint",
+  "2026-09-09-s4-accept",
+  "2026-09-07-p10-b01-id",
+  "2026-09-07-p10-b01-abirth",
+  "2026-09-07-p10-att-b0249-b01",
+  "2026-09-07-p11-req-ptm_children_maintenance_proven-b01",
+  "2026-09-07-p07-email-b01",
+  "2026-09-09-day4-num-b01-ptm-workplace",
+  "2026-09-09-day4-num-b01-ptm-position",
+  "2026-09-09-day4-num-b01-ptm-income",
+  "2026-09-09-day4-income-numbers-only",
+  "2026-09-09-day4-label-id-document",
+  "2026-09-09-day4-overflow-to-textarea",
+  "2026-09-09-day4-additional-writing-page",
+  "2026-10-01-day6-yes",
+  "2026-10-01-day6-no",
+  "2026-10-01-day6-respondent-id-required",
+  "2026-10-01-day6-respondent-phone-required",
+  "2026-10-01-day6-aw-check-b01",
+  "2026-10-01-day6-aw-move-b01",
+  "2026-10-01-day6-aw-10000-b01"
+ ]
+}

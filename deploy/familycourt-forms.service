@@ -1,0 +1,28 @@
+# systemd unit for the backend without Docker.
+# sudo cp deploy/familycourt-forms.service /etc/systemd/system/
+# sudo useradd --system --home /opt/familycourt-forms fcforms
+# sudo cp -r family-court-forms /opt/familycourt-forms && sudo chown -R fcforms: /opt/familycourt-forms
+# sudo cp /opt/familycourt-forms/backend/.env.example /etc/familycourt-forms.env # then edit it
+# sudo systemctl daemon-reload && sudo systemctl enable --now familycourt-forms
+# journalctl -u familycourt-forms -f
+# Windows without Docker: run `node server.js` as a service with NSSM (nssm install
+# FamilyCourtForms "C:\Program Files\nodejs\node.exe" server.js) and set the FC_*
+# variables on the service's environment tab.
+[Unit]
+Description=Family Court digital forms backend
+After=network.target
+
+[Service]
+Type=simple
+User=fcforms
+WorkingDirectory=/opt/familycourt-forms/backend
+EnvironmentFile=/etc/familycourt-forms.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,303 @@
+/* === Print Styles — paper-form-faithful court document ===
+   Driven by js/print-render.js (page print.html). The `.print-*` classes are
+   the approved visual design, so that one dynamic renderer produces that look. Real selectable Faruma text, RTL, CSS pagination.
+   These rules apply BOTH on screen (a paper-like preview) and in @media print. */
+
+/* ── the document (an A4 sheet) ───────────────────────────────────── */
+.print-doc {
+  direction: rtl;
+  font-family: "Faruma", "MV Faseyha", "Noto Sans Thaana", sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #111;
+  background: #fff;
+}
+.print-doc * { box-sizing: border-box; }
+
+/* ── header ────────────────────────────────────────────────────────── */
+.print-page-header {
+  position: relative;
+  text-align: center;
+  border-bottom: 2.5px solid #222;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+.print-code-box {
+  position: absolute;
+  top: 0;
+  left: 0;                       /* left in RTL = physical top-right of the page */
+  border: 1.5px solid #222;
+  padding: 3px 10px;
+  font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+  font-size: 9pt;
+  letter-spacing: 0.03em;
+  direction: ltr;
+}
+.print-court-name { font-size: 15pt; font-weight: 700; line-height: 1.4; }
+.print-country-name { font-size: 10.5pt; color: #333; margin-top: 2px; }
+.print-form-title { font-size: 12.5pt; font-weight: 700; margin-top: 6px; line-height: 1.5; }
+
+/* ── meta line (technical LTR tokens only: code · ref · date) ───────── */
+.print-meta {
+  direction: ltr;
+  text-align: center;
+  font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+  font-size: 8.5pt;
+  letter-spacing: 0.02em;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+/* ── sections ──────────────────────────────────────────────────────── */
+.print-section { margin-bottom: 12px; }
+.print-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11pt;
+  font-weight: 700;
+  background: #dedede;
+  border: 1px solid #999;
+  border-bottom: none;
+  padding: 4px 9px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.print-form-chip {
+  margin-inline-start: auto;
+  direction: ltr;
+  font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+  font-size: 8pt;
+  font-weight: 600;
+  border: 1px solid #888;
+  border-radius: 3px;
+  padding: 0 6px;
+  background: #fff;
+}
+.print-box { border: 1px solid #999; }
+
+/* ── field rows (mockup .pfr / .pfl / .pfv two-column pattern) ──────── */
+.print-field {
+  display: flex;
+  border-bottom: 1px solid #e2e2e2;
+}
+.print-field:last-child { border-bottom: none; }
+.print-label {
+  flex-shrink: 0;
+  min-width: 135px;
+  max-width: 45%;
+  padding: 4px 8px;
+  font-size: 9.5pt;
+  color: #555;
+  background: #fafafa;
+  border-left: 1px solid #eee;    /* divider toward the value cell (physical) */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.print-value {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  font-size: 10pt;
+  word-break: break-word;
+  white-space: pre-wrap;             /* a 1500-character reason keeps its line breaks */
+}
+/* the extra-writing section starts on its own sheet */
+.print-page-break { page-break-before: always; break-before: page; }
+/* Digits/codes read LTR but sit right under their Dhivehi label */
+.print-ltr { direction: ltr; text-align: right; }
+/* Empty value → a dotted fill line (gives blank-form printing for free) */
+.print-blank {
+  display: inline-block;
+  min-width: 60%;
+  height: 1.1em;
+  border-bottom: 1px dotted #555;
+  vertical-align: middle;
+}
+.print-inline-img { max-width: 45mm; max-height: 24mm; height: auto; }
+
+/* ── choice lists (blank forms show ☐ options) ─────────────────────── */
+.print-field-block { flex-direction: column; align-items: stretch; }
+.print-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 18px;
+  padding: 5px 8px;
+}
+.print-option { display: inline-flex; align-items: center; gap: 5px; font-size: 10pt; }
+.print-check-box { font-size: 11pt; line-height: 1; }
+
+/* ── notes / instructions / checklist ──────────────────────────────── */
+.print-note {
+  background: #f6f6f6;
+  border-right: 3px solid #999;
+  padding: 5px 10px;
+  font-size: 9pt;
+  color: #444;
+  margin: 6px 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.print-note p { margin: 2px 0; }
+.print-check-item {
+  display: flex;
+  gap: 7px;
+  padding: 4px 9px;
+  border-bottom: 1px dashed #eee;
+  font-size: 9.5pt;
+}
+.print-check-item:last-child { border-bottom: none; }
+.print-footnote { font-size: 8.5pt; color: #666; padding: 6px 9px 2px; line-height: 1.5; }
+.print-instructions {
+  border: 1px solid #ddd;
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-size: 8.5pt;
+  line-height: 1.6;
+  color: #333;
+}
+.print-instructions-title { font-size: 10pt; font-weight: 700; margin-bottom: 8px; }
+.print-instructions-heading { font-size: 9pt; font-weight: 700; margin: 8px 0 4px; }
+.print-instructions p { margin: 4px 0; }
+
+/* ── tables (children / witnesses) ─────────────────────────────────── */
+.print-table-section { margin-bottom: 12px; }
+.print-table-title { font-size: 10pt; font-weight: 700; margin: 8px 0 4px; }
+.print-table-wrap { overflow-x: auto; }
+.print-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+.print-table th {
+  background: #dedede;
+  border: 1px solid #999;
+  padding: 4px 6px;
+  text-align: center;
+  font-weight: 700;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.print-table td {
+  border: 1px solid #bbb;
+  padding: 4px 6px;
+  text-align: right;
+  vertical-align: top;
+}
+.print-th-num, .print-td-num { width: 30px; text-align: center; }
+
+/* ── declaration + signature + selfie ──────────────────────────────── */
+.print-declaration {
+  border: 1.5px solid #222;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.print-declaration-list {
+  list-style: disc;
+  padding-inline-start: 20px;
+  margin: 0;
+  font-size: 9.5pt;
+  line-height: 1.7;
+}
+.print-declaration-list li { margin-bottom: 3px; }
+.print-sign-grid { display: flex; gap: 14px; }
+.print-sign-id { flex: 1; align-self: flex-start; }
+.print-sign-box {
+  flex: 1;
+  border: 1px solid #999;
+  padding: 10px;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.print-sign-label { font-size: 9pt; color: #555; margin-bottom: 6px; }
+.print-sig-img { width: 45mm; max-width: 45mm; height: auto; }
+.print-selfie-img {
+  width: 30mm; max-width: 30mm; height: auto;
+  margin-top: 8px; border: 1px solid #ccc;
+}
+.print-sig-line {
+  width: 80%; height: 1.4em;
+  border-bottom: 1px solid #333; margin-top: 14px;
+}
+
+/* ── operator chrome (never printed) ───────────────────────────────── */
+.print-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  direction: ltr;
+  background: #2b2b2b;
+  color: #eee;
+  padding: 10px 18px;
+  font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+}
+.print-toolbar-link { color: #9cd0ff; text-decoration: none; }
+.print-toolbar-btn {
+  background: #6d1a41;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.print-toolbar-btn:hover { background: #82214f; }
+.print-toolbar-status { margin-inline-start: auto; font-family: monospace; font-size: 12px; color: #bbb; }
+
+/* ════════════════════════════════════════════════════════════════════
+   ON SCREEN — show a paper-like A4 sheet on a grey desk
+   ════════════════════════════════════════════════════════════════════ */
+@media screen {
+  body.print-body { background: #6c6c6c; min-height: 100vh; }
+  .print-doc {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 24px auto;
+    padding: 18mm 16mm;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   PRINT — the browser's print engine IS the PDF engine
+   ════════════════════════════════════════════════════════════════════ */
+@media print {
+  @page { size: A4 portrait; margin: 18mm 16mm; }
+
+  html, body { background: #fff !important; margin: 0; padding: 0; }
+  .no-print { display: none !important; }
+
+  .print-doc {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  /* keep atomic blocks whole; let long sections flow across pages */
+  .print-field,
+  .print-check-item,
+  .print-declaration,
+  .print-sign-grid,
+  .print-sign-box,
+  .print-sig-img,
+  .print-selfie-img,
+  .print-inline-img,
+  .print-table tr { page-break-inside: avoid; }
+  .print-section-title,
+  .print-table-title { page-break-after: avoid; }
+
+  .print-table-wrap { overflow: visible; }
+
+  /* preserve the shaded fills (section bars, table heads, label cells) */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* attachments on annex sheets at the end */
+.print-annex-ref { font-weight: 700; }
+.print-annex-img { display: block; max-width: 100%; max-height: 230mm; height: auto; margin: 6mm auto 0; border: 0.3pt solid #999; }

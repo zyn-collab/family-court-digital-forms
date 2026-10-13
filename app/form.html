@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="dv" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ފެމިލީ ކޯޓު — ފޯމު</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/rtl.css">
+  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="css/widgets.css">
+  <script src="vendor/jspdf.umd.min.js" defer></script>
+  <script src="vendor/html2canvas.min.js" defer></script>
+</head>
+<body>
+
+  <header class="court-header no-print">
+    <div class="header-content">
+      <div class="court-info">
+        <a href="index.html" class="back-link">← ފޯމުތައް</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="form-container">
+
+    <!-- the pages by name, beside the form on wide screens -->
+    <aside class="step-nav no-print" id="stepNav" aria-label="ފޯމުގެ ބައިތައް"></aside>
+
+    <div class="form-title-area">
+      <span class="form-code-badge" id="formCodeBadge"></span>
+      <h2 class="form-title">
+        <span class="dv" id="formTitleDv"></span>
+      </h2>
+    </div>
+
+    <div class="form-notification info" id="thaanaNotif" style="display:none;">
+      <span class="notif-icon"><svg class="fc-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
+      <div><span class="dv" id="formBannerDv"></span></div>
+    </div>
+
+    <div class="wizard-progress no-print" id="wizardProgress">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-steps" id="progressSteps"></div>
+    </div>
+
+    <form id="mainForm" novalidate></form>
+
+    <div class="wizard-nav no-print" id="wizardNav">
+      <button type="button" id="btnPrev" class="btn btn-secondary" onclick="FormEngine.prevStep()" style="visibility:hidden;">
+        <span class="dv">ފަހަތަށް</span>
+      </button>
+      <button type="button" id="btnNext" class="btn btn-primary" onclick="FormEngine.nextStep()">
+        <span class="dv">ކުރިއަށް</span>
+      </button>
+    </div>
+    <!-- "make alun feshumah button also in other pages" -->
+    <div class="wizard-nav-row no-print form-restart-row">
+      <button type="button" class="wizard-restart" id="btnRestart" onclick="FormEngine.restartForm()">↺ އަލުން ފައްޓަވާ</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="smsModal">
+    <div class="modal-box">
+      <!-- "no wording like bandhukuravvaa, just an X for closing the window" -->
+      <button type="button" class="modal-x" aria-label="close" onclick="document.getElementById('smsModal').style.display='none'">&times;</button>
+      <h3><span class="dv">SMS ނޮޓިފިކޭޝަން ޕްރިވިއު</span></h3>
+      <div class="sms-preview-box">
+        <div class="sms-label">To: <span id="smsTo"></span></div>
+        <p id="smsMessage" style="font-family:var(--font-en);margin-top:8px;"></p>
+        <hr style="margin:12px 0;border-color:#d1fae5;">
+        <p id="smsMessageDv" style="margin-top:8px;"></p>
+      </div>
+      <p style="font-size:0.82rem;color:var(--color-text-secondary);">
+        <span class="dv">ފެމިލީ ކޯޓުގެ SMS ޕެކޭޖުން ފޮނުވޭނެ (ޑެމޯ ޕްރިވިއު)</span>
+      </p>
+    </div>
+  </div>
+
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <p>ލޯޑު ކުރަނީ...</p>
+  </div>
+
+  <script src="specs/specs-bundle.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/spec-loader.js"></script>
+  <script src="js/site-config.js"></script>
+  <script src="js/data-layer.js"></script>
+  <script src="js/media-capture.js"></script>
+  <script src="js/lookups.js"></script>
+  <script src="js/combine-specs.js"></script>
+  <script src="js/engine.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      const params = new URLSearchParams(window.location.search);
+      const formCode = params.get('form');
+      // ?forms=Fm-C-B03C,Fm-C-B07,Fm-C-B05 → combined flow (shared sections filled once)
+      const multi = (params.get('forms') || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      if (!formCode && !multi.length) {
+        document.body.innerHTML = '<div style="padding:48px;text-align:center;font-family:system-ui;direction:ltr">' +
+          '<h2>Form not specified</h2>' +
+          '<p>Use <code>?form=Fm-C-XX</code> or <code>?forms=Fm-C-XX,Fm-C-YY</code> in the URL.</p>' +
+          '<p><a href="index.html">← Forms list</a></p></div>';
+        return;
+      }
+      try {
+        let spec;
+        if (multi.length > 1) {
+          spec = await CombineSpecs.load(multi);
+        } else {
+          spec = await SpecLoader.load(formCode || multi[0]);
+        }
+        document.getElementById('loadingOverlay').style.display = 'none';
+        FormEngine.init(spec, { party: params.get('party') });
+      } catch (e) {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        document.body.innerHTML = '<div style="padding:48px;text-align:center;font-family:system-ui;direction:ltr">' +
+          '<h2>Could not load form</h2><p>' + e.message + '</p>' +
+          '<p><a href="index.html">← Forms list</a></p></div>';
+      }
+    });
+  </script>
+</body>
+</html>

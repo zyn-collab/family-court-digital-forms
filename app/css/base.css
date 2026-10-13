@@ -1,0 +1,252 @@
+/* === Family Court Digital Forms — Base Styles === */
+
+/* --- Web Font: Faruma for Thaana --- */
+@font-face {
+  font-family: "Faruma";
+  src: url("../fonts/Faruma.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Faruma";
+  src: url("../fonts/Faruma.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Family Court brand: wine / maroon-purple */
+  --color-primary: #6d1a41;
+  --color-primary-light: #f6ecf1;
+  --color-primary-dark: #45122c;
+  --color-accent: #a52056;
+  --color-bg: #f7f4f6;
+  --color-surface: #ffffff;
+  --color-text: #23131c;
+  --color-text-secondary: #6b6069;
+  --color-border: #e6dee2;
+  --color-border-focus: #6d1a41;
+  --color-error: #d32f2f;
+  --color-error-bg: #fdecea;
+  --color-success: #2e7d32;
+  --color-warning: #f9a825;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+  --transition: 0.2s ease;
+  --max-width: 880px;   /* "make full width wider" */
+  --font-dv: "Faruma", "MV Faseyha", "Noto Sans Thaana", sans-serif;
+  --font-en: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Print-only elements hidden on screen */
+.print-only { display: none !important; }
+
+body {
+  font-family: var(--font-dv);
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--color-text);
+  background: var(--color-bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* English / Latin text uses its own stack */
+.en, [lang="en"],
+input[type="email"], input[type="tel"], input[type="number"], input[type="date"],
+.form-code, .form-code-badge, code, pre, .progress-text {
+  font-family: var(--font-en);
+}
+
+/* -- Court Header -- */
+.court-header {
+  background: var(--color-primary);
+  color: white;
+  padding: 14px 24px;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.court-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.country-name {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-top: 1px;
+}
+.back-link {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-family: var(--font-dv);   /* the link text is Thaana ("ފޯމުތައް") */
+  display: inline-block;
+  margin-bottom: 2px;
+}
+.back-link:hover { color: white; }
+
+/* --- Footer --- */
+.court-footer {
+  background: var(--color-primary-dark);
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  padding: 24px;
+  font-size: 0.8rem;
+  margin-top: 48px;
+  line-height: 1.8;
+}
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 32px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-dv);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: 130px;
+}
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(109, 26, 65, 0.3);
+}
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  box-shadow: 0 4px 12px rgba(109, 26, 65, 0.4);
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+}
+.btn-secondary:hover { background: var(--color-bg); }
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-family: var(--font-dv);
+}
+.btn-ghost { border: none; background: transparent; color: var(--color-text-secondary); }
+.btn-lang {
+  padding: 7px 18px;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-en);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.btn-lang:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.6); }
+
+/* --- Catalog --- */
+.catalog {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 36px 24px;
+}
+.catalog-intro { margin-bottom: 36px; }
+.catalog-intro h2 { font-size: 1.5rem; margin-bottom: 8px; }
+.subtitle { color: var(--color-text-secondary); }
+.lang-toggle { margin-bottom: 24px; }
+
+.form-group { margin-bottom: 40px; }
+.group-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--color-primary);
+  color: var(--color-primary-dark);
+}
+.form-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+.form-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+.form-code {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-en);
+  letter-spacing: 0.03em;
+}
+.form-title { font-size: 0.95rem; font-weight: 600; line-height: 1.9; }
+.form-pages { font-size: 0.78rem; color: var(--color-text-secondary); font-family: var(--font-en); }
+
+/* --- Loading --- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.96);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 1000;
+  transition: opacity 0.3s;
+}
+.loading-overlay.hidden { opacity: 0; pointer-events: none; }
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .court-header { padding: 12px 16px; }
+  .court-name { font-size: 1.1rem; }
+  .catalog { padding: 20px 16px; }
+  .form-cards { grid-template-columns: 1fr; }
+}

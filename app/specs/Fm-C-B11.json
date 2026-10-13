@@ -1,0 +1,233 @@
+{
+ "form_code": "Fm-C-B11",
+ "ref_prefix": "OL",
+ "header": {
+  "court_dv": "ފެމިލީ ކޯޓު ފެމިލީ ކޯޓު",
+  "src": [
+   "b0002",
+   "b0005"
+  ],
+  "location_dv": "މާލެ، ދިވެހިރާއްޖެމާލެ، ދިވެހިރާއްޖެ"
+ },
+ "title_dv": "އޮންލައިންކޮށް ޝަރީޢަތް ހިންގައި ދިނުމަށް އެދި ހުށަހަޅާ ފޯމު",
+ "src_title": [
+  "b0007"
+ ],
+ "title_en": "Online hearing request form",
+ "steps": [
+  {
+   "step_key": "applicant",
+   "title_dv": "ހުށަހަޅާ ފަރާތުގެ މަޢުލޫމާތު:",
+   "src_title": "b0017",
+   "notice_dv": "ތާނައަކުރުން ފޯމު ފުރުމަށް",
+   "notice_from_comment": "0",
+   "module": "applicant",
+   "fields": [
+    {
+     "type": "text",
+     "src": [
+      "b0018",
+      "b0019"
+     ],
+     "label_dv": "ފުރިހަމަ ނަން:",
+     "key": "applicant_full_name",
+     "number": "1.1",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "module_field": "full_name",
+     "review_flag": "FC comment 0 (form must be filled in Thaana script) is surfaced as this step's notice via notice_from_comment, but its source block is the form-level attention-notice (header) block, so the comment cannot auto-attach in the acceptance report — recorded here for sign-off. FC comment 3 (the declaration 'Name' field must auto-populate from 1.1 full name) is attached to the declaration name label; the auto-fill itself depends on engine support — recorded for sign-off."
+    },
+    {
+     "type": "address",
+     "src": [
+      "b0022",
+      "b0023"
+     ],
+     "label_dv": "ދާއިމީ އެޑްރެސް:",
+     "key": "applicant_permanent_address",
+     "number": "1.2",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "module_field": "permanent_address",
+     "amend": [
+      "2026-09-07-p07-req-applicant_permanent_address",
+      "2026-09-07-p06-addr-applicant_permanent_address"
+     ]
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0026",
+      "b0027"
+     ],
+     "label_dv": "އައި.ޑީ ކާޑު ނަންބަރު:",
+     "key": "applicant_id_number",
+     "number": "1.3",
+     "validation": {
+      "required": true,
+      "format": "id_card",
+      "pattern": "^A[0-9]{6}$"
+     },
+     "module_field": "id_number"
+    },
+    {
+     "type": "tel",
+     "src": [
+      "b0030",
+      "b0031"
+     ],
+     "label_dv": "ގުޅޭނެ ފޯނު ނަންބަރު:",
+     "key": "applicant_phone",
+     "number": "1.4",
+     "validation": {
+      "required": true,
+      "pattern": "^[0-9]{7,15}$"
+     },
+     "module_field": "phone",
+     "fc_notes": [
+      {
+       "id": "1",
+       "text": "ހަމައެކަނި ހިސާބު އަދަދު ލިޔެވޭ ގޮތަށް"
+      }
+     ]
+    },
+    {
+     "type": "tel",
+     "src": [
+      "b0034",
+      "b0035"
+     ],
+     "label_dv": "ވަޓްސްއަޕް / ވައިބަރ ނަންބަރު:",
+     "key": "applicant_whatsapp_viber",
+     "number": "1.5",
+     "validation": {
+      "pattern": "^[0-9]{7,15}$"
+     },
+     "review_flag": "WhatsApp/Viber number may be an international number; the default Maldives 7-digit phone pattern applied to tel fields could be too strict — Court to confirm accepted formats."
+    },
+    {
+     "type": "email",
+     "src": [
+      "b0038",
+      "b0039"
+     ],
+     "label_dv": "އީ-މެއިލް އެޑްރެސް:",
+     "key": "applicant_email",
+     "number": "1.6",
+     "validation": {
+      "format": "email",
+      "required": true
+     },
+     "amend": [
+      "2026-09-07-p07-req-applicant_email"
+     ]
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0042",
+      "b0043"
+     ],
+     "label_dv": "މައްސަލައިގެ ބާވަތް:",
+     "key": "case_type",
+     "number": "1.7",
+     "validation": {
+      "required": true,
+      "script": "thaana"
+     },
+     "fc_notes": [
+      {
+       "id": "2",
+       "text": "ޑްރޮޕްޑައުން ލިސްޓުގައި މައްސަލަތަކުގެ ބާވަތްތައް ހިމެނުމަށްފަހު ލިސްޓުން ސެލެކްޓް ކުރުމަށް"
+      }
+     ],
+     "review_flag": "FC comment 2: this should be a dropdown selected from a prepared list of case types; the list is not in the document, so the field is left as free text pending that list."
+    },
+    {
+     "type": "text",
+     "src": [
+      "b0046",
+      "b0047"
+     ],
+     "label_dv": "ޤަޟިއްޔާ ނަންބަރު:",
+     "key": "case_number",
+     "number": "1.8"
+    }
+   ]
+  },
+  {
+   "step_key": "declaration",
+   "type": "declaration",
+   "declaration_lines_dv": [
+    "އިޤްރާރު:",
+    "އޮންލައިންކޮށް ޝަރީއަތުގެ މަޖިލިސް ބޭއްވުމަށް ކޯޓުންދޭ އިރުޝާދުތަކާއި އެއްގޮތަށް ޢަމަލުކުރުމަށާއި، ޝަރީޢަތަށް ހުށަހަޅާ ލިޔެކިޔުންތަކުގައި އަދި ޝަރީއަތުގެ މަޖިލީހުގައި، ތެދު މަޢުލޫމާތު ދިނުމަށާއި، ޝަރީޢަތުގެ މަޖިލިސް ކުރިއަށްދާއިރު ޢާއްމު އަދަބުތަކާ ޚިލާފު އެއްވެސް ކަމެއް ނުކުރުމަށާއި، އެހެން ފަރާތެއްގެ ކިބައިން ވެސް އެފަދަ ކަމަކަށް ފުރުސަތު ނުދިނުމަށާއި، މި ޝަރީޢަތާ ގުޅިގެން ކޯޓުން އަންގާ އެއްގުންތައް ފުރިހަމަ ކުރުމަށްޓަކައި ކޯޓަށް ޙާޟިރުވާން އަންގައިފިނަމަ ކޯޓަށް ޙާޟިރުވުމަށާއި، ސޮއިކުރަންޖެހޭ ލިޔެކިޔުންތަކުގައި ސޮއިކުރުމަށާއި، މި ޝަރީޢަތާއި ގުޅޭ އެނޫން ވެސް ކަންކަމުގައި ކޯޓުން އަންގާ ގޮތެއްގެ މަތިން ޢަމަލުކޮށް ކޯޓަށް ފުރިހަމަ އެއްބާރުލުން ދޭންހުރިކަމުގައި އަހުރެން އިޤުރާރުވަމެވެ."
+   ],
+   "src_iqraar": [
+    "b0051",
+    "b0053"
+   ],
+   "name_label_dv": "ނަން:",
+   "src": [
+    "b0055",
+    "b0065",
+    "b0058"
+   ],
+   "sign_label_dv": "ސޮއި:",
+   "date_label_dv": "ތާރީޚް:",
+   "include_sms_phone": true,
+   "fc_notes": [
+    {
+     "id": "3",
+     "text": "އޮޓޯއިން 1.1 ގައިވާ ނަން ފެންނަންވާނެ"
+    },
+    {
+     "id": "4",
+     "text": "ކަލަންޑަރ އެއް ލުމަށް"
+    }
+   ]
+  },
+  {
+   "step_key": "signature_supplement",
+   "fields": [
+    {
+     "type": "notice_block",
+     "lines_dv": [
+      "އިނގިލީގެ ނިޝާން:"
+     ],
+     "src": [
+      "b0068"
+     ],
+     "fc_notes": [
+      {
+       "id": "5",
+       "text": "އިނގިލީގެ ނިޝާން ޖެހޭނެ ގޮތްތަކަކީ ކޮބައިތޯ ބެލުމަށް"
+      }
+     ],
+     "review_flag": "FC comment 5: the Court has not yet decided how the fingerprint (thumbprint) is to be captured for an online submission; rendered as a display-only label pending that decision."
+    }
+   ]
+  },
+  {
+   "step_key": "review",
+   "type": "review"
+  }
+ ],
+ "source": {
+  "file": "online-koh-shariah-hingumah-edhi-hushalahaa-form-v2.docx",
+  "sha256": "41c0f17fc91267f8a7dd6e9a94b5258bab7457fec74891153dba4cce58e48dd9"
+ },
+ "amend": [
+  "2026-09-01-p10-a"
+ ],
+ "amendments_applied": [
+  "2026-09-01-p10-a",
+  "2026-09-07-p07-req-applicant_email",
+  "2026-09-07-p07-req-applicant_permanent_address",
+  "2026-09-07-p06-addr-applicant_permanent_address",
+  "2026-10-01-day6-no-email-b11-b0073"
+ ]
+}

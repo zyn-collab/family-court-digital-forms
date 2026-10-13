@@ -1,0 +1,95 @@
+/* === RTL / Dhivehi Typography === */
+
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] body {
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeLegibility;
+}
+
+/* Thaana needs generous line-height */
+html[dir="rtl"] .field-label,
+html[dir="rtl"] .section-title .dv,
+html[dir="rtl"] .form-title .dv,
+html[dir="rtl"] .radio-option .dv,
+html[dir="rtl"] .checkbox-option .dv,
+html[dir="rtl"] .declaration-text {
+  line-height: 2.1;
+}
+
+/* Input fields RTL — typed Dhivehi and placeholder both right-aligned */
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  direction: rtl;
+  text-align: right;
+}
+html[dir="rtl"] input::placeholder,
+html[dir="rtl"] textarea::placeholder {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Numeric / Latin fields render left-to-right internally, but stay aligned to
+   the right (the start side in RTL) so they sit under their Dhivehi labels
+   instead of drifting to the far left. */
+html[dir="rtl"] input[type="number"],
+html[dir="rtl"] input[type="tel"],
+html[dir="rtl"] input[type="email"],
+html[dir="rtl"] input[type="date"],
+html[dir="rtl"] input.date-input {
+  direction: ltr;
+  text-align: right;
+}
+html[dir="rtl"] input[type="number"]::placeholder,
+html[dir="rtl"] input[type="tel"]::placeholder,
+html[dir="rtl"] input[type="email"]::placeholder,
+html[dir="rtl"] input.date-input::placeholder {
+  text-align: right;
+}
+
+/* Checkbox/radio: in an RTL flex row the input already sits on the right and
+   the label flows from the right — so keep the natural `row` (row-reverse would
+   double-flip it back to a left-hand LTR layout). */
+html[dir="rtl"] .radio-option,
+html[dir="rtl"] .checkbox-option {
+  flex-direction: row;
+  text-align: right;
+}
+
+/* Wizard nav: natural RTL row puts "prev" on the right and "next" on the left. */
+html[dir="rtl"] .wizard-nav {
+  flex-direction: row;
+}
+
+/* Progress bar fills from right */
+html[dir="rtl"] .progress-fill {
+  transform-origin: right;
+}
+
+/* Table alignment */
+html[dir="rtl"] table { direction: rtl; }
+html[dir="rtl"] th, html[dir="rtl"] td { text-align: right; }
+
+/* Sub-group indent from right */
+html[dir="rtl"] .field-sub-group {
+  margin-right: 16px;
+  margin-left: 0;
+  border-right: 3px solid var(--color-primary-light);
+  border-left: none;
+  padding-right: 16px;
+  padding-left: 0;
+}
+
+/* Error icon position */
+html[dir="rtl"] .field-error::before {
+  margin-left: 4px;
+  margin-right: 0;
+}
+
+/* Back link in header */
+html[dir="rtl"] .back-link {
+  unicode-bidi: plaintext;
+}
