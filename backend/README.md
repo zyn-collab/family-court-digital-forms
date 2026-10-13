@@ -17,54 +17,44 @@ production" below.
 ## Run it
 
 ```bash
-cd family-court-forms/backend
+cd backend
+node user-cli.js add <username> "<Full name>" admin    # first staff account
 node server.js
-# → Family Court reference backend on http://localhost:4000
+# → site:  http://localhost:4000/   admin: http://localhost:4000/admin.html
 ```
 
-Environment variables (all optional):
+The backend serves the site (`../app`) and the API on one address, so a browser
+pointed at it works with no further setting. Settings are environment variables,
+read from `backend/.env` when present (see `.env.example`; a value set by the
+service manager or Docker takes precedence). The most used:
 - `FC_PORT` — port (default `4000`)
-- `FC_STORE` — `json` (default) or `sqlite`; picks where data is stored
-- `FC_ALLOW_ORIGIN` — CORS origin (default `*`, dev only; see "Production
-  settings")
-- `FC_TRUST_PROXY` — set to `1` only when behind a reverse proxy (see
-  "Production settings")
+- `FC_STORE` — `json` (default) or `sqlite` (recommended); `user-cli.js` and
+  `backup.js` read the same file, so they always use the same store
+- `FC_TRUST_PROXY` — `1` only behind a reverse proxy
+- `FC_SERVE_APP=0` — only if another web server serves `app/`; then set
+  `FC_API_BASE` in `app/js/site-config.js` and `FC_ALLOW_ORIGIN` here to the
+  site's address
 
-There is no admin password variable — staff log in with their own accounts (see
-"Staff accounts" below).
+There is no admin password variable: staff log in with their own accounts.
 
-Runtime data is written to `./data` (drafts, submissions) and `./uploads`
-(extracted attachment files, one folder per submission). Both are gitignored.
+Runtime data is written to `./data` and `./uploads` unless the paths are set.
+Both are ignored by git.
 
-Test the whole flow (no server needed to be running — the test starts one):
+Tests (no server needs to be running; the test starts one):
 ```bash
-node test.js      # save draft → load → submit → status → admin login → list → update → attachment on disk
+node test.js                    # JSON store
+FC_STORE=sqlite node test.js    # SQLite store
 ```
-
-## Point the app at it
-
-The frontend already has a matching data layer, `app/js/api-config.js`. To make
-a page use the backend instead of localStorage, change its script include:
-
-```js
-// app/js/site-config.js
-window.FC_API_BASE = 'http://localhost:4000';   // '' keeps the browser-only demonstration mode
-```
-
-That is the only frontend setting: `js/data-layer.js` loads `api-config.js` when
-it is set and `browser-store.js` (browser store) when it is empty, and both
-expose the same interface. The public demo site ships with it empty.
 
 **Smoke test an installation:** `node smoke.js https://<host> <username> <password>`
 walks health → reference → draft → submission with files → status → login → list →
 record → attachment → status change → audit → export and prints OK or FAIL per step.
 
-**Docker:** `docker compose up -d` at the repository root starts the service and an
-nginx that serves `app/` and proxies `/api/` (`backend/Dockerfile`,
-`deploy/nginx.conf`); `deploy/familycourt-forms.service` is the systemd unit for a
-plain install.
+**Docker:** `docker compose up -d` at the repository root runs the whole system on
+port 8080 (`backend/Dockerfile`); `deploy/nginx.conf` is a reference HTTPS front;
+`deploy/familycourt-forms.service` is the systemd unit for a plain install.
 
-See `API.md` for the full endpoint contract and `schema.sql` for the production
+See `API.md` / `openapi.yaml` for the endpoint contract and `schema.sql` for the
 data model.
 
 ## Staff accounts

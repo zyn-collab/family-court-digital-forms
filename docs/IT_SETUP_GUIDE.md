@@ -1,77 +1,55 @@
 # Family Court digital forms — setup guide for the Court's IT team
 
-*Written for a small IT team. No prior knowledge of this project is assumed. Where a step needs a decision from the Court (not IT), it says so.*
+*For a small IT team. No prior knowledge of this project is assumed. Where a step needs a decision from the Court (not IT), it says so.*
 
 ---
 
 ## 1. What the system is, in one page
 
-The digital forms are two pieces:
+| Piece | What it is |
+|---|---|
+| **The site** (`app/` folder) | Plain HTML/JavaScript pages: the front page, the guided start, the 17 forms, the status page, the print view and the staff admin panel. No build step. |
+| **The backend** (`backend/` folder) | A small Node.js server that stores drafts, submissions, uploaded files, staff accounts and the audit log, answers the site's requests, and also serves the site itself. |
 
-| Piece | What it is | Where it runs today | Where it should run for real filings |
-|---|---|---|---|
-| **The website** (`app/` folder) | Plain HTML/JavaScript pages: the landing page, the question flow, the 17 forms, the status-lookup page and the staff admin page. No server code. | Vercel (a free static-hosting service), rebuilt on every push to GitHub: https://marriagegovmv.vercel.app/ | Any web server that can serve static files over HTTPS — Vercel can stay, or the Court's own web server. |
-| **The backend** (`backend/` folder) | A small Node.js server that stores drafts, submissions, uploaded files, staff accounts and the audit log, and answers the website's requests. | **Nowhere yet.** The live site stores everything inside the visitor's own browser (a demo arrangement). Nothing reaches the Court. | A server the Court controls, behind HTTPS. This is the one thing that must exist before the first real filing. |
+One process runs everything: `node server.js` serves the site and the API on one address (by default port 4000). Nothing else has to be installed or configured to try it.
 
-Until the backend is hosted, the live site is a working demonstration only: a citizen who fills a form on their phone has that form on their phone and nowhere else, and the admin page shows nothing.
-
-**What the backend needs from the machine it runs on**
-- Node.js 22.5 or newer (the built-in database support arrived in that version). No other software: the server has zero third-party packages, so there is nothing to install with `npm` and nothing that can silently update.
+**What the machine needs**
+- Node.js 22.5 or newer (the built-in database arrived in that version). Nothing else: the server has no third-party packages, so there is nothing to install with `npm` and nothing that can silently update. Docker can be used instead (section 2).
 - One folder on a disk that is backed up, for the database file and uploaded documents.
-- An HTTPS "front door" (a reverse proxy such as nginx, IIS with ARR, or Caddy) that receives `https://…` traffic and passes it to the Node process on an internal port. The Node server itself speaks plain HTTP only, on purpose.
-- Very little capacity: a 1-CPU, 1–2 GB virtual machine handles the Court's volume many times over. Disk grows with uploads (assume up to ~20 MB per filing with photos).
+- For public use, an HTTPS front (nginx, IIS with ARR, Caddy, or the Court's load balancer) passing traffic to the Node process. The Node server speaks plain HTTP only, on purpose.
+- Very little capacity: a 1-CPU, 1–2 GB virtual machine handles the Court's volume many times over. Disk grows with uploads (up to about 20 MB per filing with photos).
 
 ---
 
-## 2. Setting the backend up — step by step
+## 2. Setting it up — step by step
 
-> Shorter route: `docs/INTEGRATION_HANDOVER.md` has the Docker and systemd go-live, and the frontend now has a single setting, `app/js/site-config.js`, instead of edits on each page.
+1. **Get the code** from the GitHub repository (`git clone …`), for example to `/srv/familycourt` or `C:\familycourt`.
+2. **Check Node:** `node --version` must print `v22.5` or higher (install the current LTS from https://nodejs.org if not).
+3. **Settings (optional for a first run):** copy `backend/.env.example` to `backend/.env` and change what is needed. For real use set `FC_STORE=sqlite` (already set in the example) and put the database and uploads on backed-up storage (`FC_DB_PATH`, `FC_UPLOADS_DIR`). The server, `user-cli.js` and `backup.js` all read this file, so they always use the same database.
+4. **Create the first staff account** (nobody can log in until one exists):
+   ```
+   cd backend
+   node user-cli.js add <username> "<Full name>" admin
+   ```
+   It asks for the password twice (hidden while typing, minimum 8 characters). Further accounts are created by an admin in the admin panel, under "Staff accounts".
+5. **Start it:** `node server.js`. It prints the site and admin addresses. Open `http://<server>:4000/` for the forms and `http://<server>:4000/admin.html` for the admin panel.
+6. **Keep it running** as a service, so it restarts after a reboot or crash: `deploy/familycourt-forms.service` for Linux (systemd; its header lists the commands), or NSSM on Windows pointing at `node server.js` in the `backend` folder.
+   With Docker instead of steps 2–6: `docker compose up -d` at the repository root, then `docker compose exec forms node user-cli.js add <username> "<Full name>" admin`; the site is on port 8080.
+7. **Put HTTPS in front** for anything beyond an internal trial: `deploy/nginx.conf` is a reference that passes everything to the backend. Set `FC_TRUST_PROXY=1` so rate limits and the audit log see the visitor's address rather than the proxy's.
+8. **Prove it works:** `node backend/smoke.js https://<address> <username> <password>` must print OK on every line. Then file a form from a phone, look its number up on the status page, and open it in the admin panel.
 
-These steps assume a Linux or Windows server on which you can open a terminal.
-
-1. **Get the code.** Copy the `family-court-forms` folder from the GitHub repository (https://github.com/zyn-collab/marriagegovmv) to the server, e.g. `/srv/familycourt` or `C:\familycourt`.
-2. **Check Node.** Run `node --version`. It must print `v22.5` or higher. If not, install the current LTS from https://nodejs.org.
-3. **Choose where data lives.** Create a folder on backed-up storage, e.g. `/srv/familycourt-data` (Linux) or `D:\familycourt-data` (Windows), containing two sub-folders: `db` and `uploads`.
-4. **Run the server once by hand** to confirm it starts:
-   ```
-   cd family-court-forms/backend
-   FC_STORE=sqlite FC_DB_PATH=/srv/familycourt-data/db/familycourt.db FC_UPLOADS_DIR=/srv/familycourt-data/uploads FC_PORT=4000 node server.js
-   ```
-   (On Windows PowerShell set the variables first: `$env:FC_STORE='sqlite'` and so on, then `node server.js`.) It prints `Family Court reference backend on http://localhost:4000`. Stop it with Ctrl+C.
-5. **Create the first staff account.** Nobody can log in until one exists:
-   ```
-   FC_STORE=sqlite FC_DB_PATH=/srv/familycourt-data/db/familycourt.db node user-cli.js add registrar1 "Aminath Registrar" registrar
-   ```
-   It asks for a password twice (hidden while typing, minimum 8 characters). Use the same `FC_STORE` / `FC_DB_PATH` values as the server, or the two will look at different databases.
-   Roles: `viewer` (read only), `officer` and `registrar` (may change a case's status and read the audit log), `admin` (reserved for future admin-only features). When someone leaves: `node user-cli.js deactivate <username>` — do not delete accounts, the audit log refers to them.
-6. **Keep it running.** Register the server as a service so it restarts after a reboot or crash:
-   - Linux: a `systemd` unit with `ExecStart=/usr/bin/node /srv/familycourt/family-court-forms/backend/server.js`, `Restart=always`, and the environment variables from step 4 in an `EnvironmentFile`.
-   - Windows: NSSM ("Non-Sucking Service Manager") or Task Scheduler "At startup", pointing at the same command with the same variables.
-7. **Put HTTPS in front.** Configure the reverse proxy to forward `https://api.familycourt.gov.mv/` (any name the Court chooses) to `http://127.0.0.1:4000/`. Obtain a certificate (Let's Encrypt is free and automatic in Caddy and in nginx with certbot). Then set two more variables on the service:
-   - `FC_TRUST_PROXY=1` — so rate limits and the audit log see the citizen's real address, not the proxy's. Set this **only** when a proxy is in front.
-   - `FC_ALLOW_ORIGIN=https://marriagegovmv.vercel.app` (or the Court's site address once it has one) — the only website allowed to call the API. Never leave it as `*` in production.
-8. **Point the website at the backend.** In `app/form.html`, `app/status.html` and `app/print.html`, replace the line
-   `<script src="js/browser-store.js"></script>` with
-   ```
-   <script>window.FC_API_BASE = 'https://api.familycourt.gov.mv';</script>
-   <script src="js/api-config.js"></script>
-   ```
-   (`app/admin.html` already uses `api-config.js`; set the same `FC_API_BASE` there.) Commit and push; Vercel republishes within a minute. From that moment, forms save to the Court's server.
-9. **Prove it works.** Open the site, start a form, note the reference number, close the tab, reopen the status page and look the number up. Log in to `app/admin.html` with the account from step 5 and see the draft/submission. Check `/srv/familycourt-data/uploads/<reference>/` for the uploaded files.
-
-**Full list of settings (environment variables)**
+**Settings most often changed** (full list with explanations in `backend/.env.example`)
 
 | Variable | Meaning | Production value |
 |---|---|---|
-| `FC_STORE` | `json` (files, demo) or `sqlite` (real database) | `sqlite` |
-| `FC_DB_PATH` | the database file | on backed-up storage |
-| `FC_UPLOADS_DIR` | folder for uploaded documents | on backed-up storage |
-| `FC_PORT` | internal port the proxy forwards to | `4000` (any free port) |
-| `FC_ALLOW_ORIGIN` | the website's address | the Court's site, never `*` |
-| `FC_TRUST_PROXY` | read the real client IP from the proxy | `1` behind a proxy, unset otherwise |
+| `FC_STORE` | `json` (files) or `sqlite` (database) | `sqlite` |
+| `FC_DB_PATH`, `FC_UPLOADS_DIR` | database file, folder for uploaded documents | on backed-up storage |
+| `FC_PORT` | port the server listens on | `4000` (any free port) |
+| `FC_TRUST_PROXY` | read the visitor's address from the HTTPS front | `1` behind a proxy |
+| `FC_ALLOW_ORIGIN` | only if the site is served from a different address than the API | unset |
+| `FC_RATE_SCALE` | per-connection request limits (multiple of a strict reference) | `20` (default); `0` turns them off |
 | `FC_MAX_FILE_MB` | largest single uploaded document | `10` (default) |
-| `FC_BACKUP_DIR` | where `backup.js` writes | on a different disk from the data |
-| `FC_DEV` | allows starting with `FC_ALLOW_ORIGIN` unset | never set in production |
+| `FC_BACKUP_DIR` | where `backup.js` writes | a different disk from the data |
 
 ---
 
@@ -89,7 +67,7 @@ These steps assume a Linux or Windows server on which you can open a terminal.
 
 **Who can see what**
 - Citizens: only their own draft (by reference number) and the public status of a submission (status and timeline, never the form contents). When staff set a case to "returned for correction", the status page lets the citizen send one replacement document for it; the case then returns to "processing".
-- Staff: everything, after logging in, according to role. There is no self-registration and no user-management web page; accounts are created only on the server with `user-cli.js`. This is deliberate.
+- Staff: everything, after logging in, according to role. There is no self-registration: the first admin account is created on the server with `user-cli.js`, and further accounts by an admin in the admin panel ("Staff accounts"), every change audited.
 
 ---
 
@@ -139,7 +117,7 @@ What IT must know:
 | Path | What |
 |---|---|
 | `app/` | the site: forms (`form.html`), start page (`index.html`), guided start (`wizard.html`), status page (`status.html`), print view (`print.html`), admin panel (`admin.html`); `app/specs/` holds one definition per form |
-| `app/js/site-config.js` | the one frontend setting (`FC_API_BASE`) |
+| `app/js/site-config.js` | the backend address, only needed when another web server serves `app/` |
 | `backend/` | the service (`server.js`), stores, accounts (`user-cli.js`), tests (`test.js`), smoke test (`smoke.js`), `openapi.yaml`, `API.md`, `Dockerfile`, `.env.example` |
 | `deploy/` | nginx configuration and systemd unit; `docker-compose.yml` at the root |
 | `docs/` | this guide, `INTEGRATION_HANDOVER.md`, `EXPORT_COLUMNS.md` (CSV columns per form) |

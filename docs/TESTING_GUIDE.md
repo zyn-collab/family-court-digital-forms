@@ -7,10 +7,11 @@ real case.
 ## 1. Preparing the test installation (IT)
 
 1. Install as in `docs/INTEGRATION_HANDOVER.md` section 2, on a test server with its
-   own address (for example `test-forms.familycourt.gov.mv`).
+   own address (for example `test-forms.familycourt.gov.mv`). The backend serves the
+   site, so testers use that one address for everything.
 2. Leave `FC_RATE_SCALE` at its default (20). The request limits then never affect an
    office of testers sharing one internet connection.
-3. Set `FC_API_BASE` in `app/js/site-config.js` to the test address.
+3. Nothing in `app/` needs changing.
 4. Create the accounts:
    ```
    node user-cli.js add <username> "<Full name>" admin      # one per IT administrator

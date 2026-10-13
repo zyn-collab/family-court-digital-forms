@@ -18,6 +18,7 @@
  * for the restore drill.
  * =========================================================================== */
 'use strict';
+require('./env');   // backend/.env, if present
 const fs = require('fs');
 const path = require('path');
 

@@ -69,19 +69,12 @@ never fails the request that caused it. The body is the `Event` schema in
 
 ## How the frontend maps to this
 
-`app/js/api-config.js` implements the same `window.DataStore` interface the
-app already uses, so switching a page from localStorage to the backend is just:
-
-```js
-// app/js/site-config.js — the one frontend setting
-window.FC_API_BASE = 'https://forms.familycourt.gov.mv';   // '' = browser-only demonstration mode
-```
-
-Every page loads `js/site-config.js` then `js/data-layer.js`, which picks
-`api-config.js` when the address is set and `browser-store.js` (browser store)
-when it is empty; `admin.html` always uses the API layer.
-The admin page additionally calls `DataStore.adminLogin(password)` once
-before listing submissions.
+`app/js/api-config.js` implements the same data-layer interface as the browser store
+(`window.DataStore`), over HTTP. When the backend serves the
+site, it answers `js/site-config.js` with the site's own address, so every page talks
+to the API with no setting. When another web server serves `app/`, set
+`window.FC_API_BASE` in `app/js/site-config.js` to the backend's address and
+`FC_ALLOW_ORIGIN` on the backend to the site's address.
 
 ## What production must add on top of the reference server
 

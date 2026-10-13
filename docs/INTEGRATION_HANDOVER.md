@@ -34,24 +34,25 @@ Not built until the Court supplies the inputs: the SMS and email gateway itself,
 
 ## 2. Go-live sequence
 
-**With Docker (one host, about an hour):**
+**First run, on any machine with Node.js 22.5 or later (about five minutes):**
 
 ```
-git clone <repo>  &&  cd family-court-forms
-cp backend/.env.example backend/.env         # edit FC_ALLOW_ORIGIN, FC_PUBLIC_SITE, webhooks
-# edit app/js/site-config.js: FC_API_BASE = 'https://<public address of this host>'
-docker compose up -d
-docker compose exec api node user-cli.js add <username> "<Name>" admin
+git clone <repository address>
+cd family-court-digital-forms/backend
+node user-cli.js add <username> "<Full name>" admin
+node server.js
 ```
 
-The site is on port 8080 (`deploy/nginx.conf` serves `app/` and proxies `/api/` to the backend). Put the Court's TLS termination in front, or add the certificate to that nginx configuration.
+Open `http://localhost:4000/` for the forms and `http://localhost:4000/admin.html` for the admin panel. The backend serves the site and the API on one address, so nothing else needs configuring. `node seed-sample.js http://localhost:4000 2 <username> <password>` adds sample filings for every form.
 
-**Without Docker:** Node 22.5 or later on the server; `deploy/familycourt-forms.service` for systemd (its header has the commands), or NSSM on Windows. Serve `app/` from any static web server on the same origin and proxy `/api/` to the port in `FC_PORT` (`deploy/nginx.conf` is the reference).
+**On a server:** copy `backend/.env.example` to `backend/.env` and set the storage paths (section 3); run the server as a service (`deploy/familycourt-forms.service` for systemd, NSSM on Windows); put HTTPS in front (`deploy/nginx.conf` passes everything to the backend) and set `FC_TRUST_PROXY=1`.
+
+**With Docker:** `docker compose up -d` at the repository root, then `docker compose exec forms node user-cli.js add <username> "<Full name>" admin`. The site is on port 8080; data is kept in the `fc-data` volume.
 
 **Then, in order:**
 
 1. `curl https://<host>/api/health` answers `{"ok":true}`.
-2. Create the first admin account on the server (`user-cli.js add … admin`). Further accounts are created in the admin panel under "Staff accounts".
+2. Further staff accounts are created by the admin in the panel, under "Staff accounts".
 3. Run the smoke test: `node backend/smoke.js https://<host> <username> <password>`. Every line must read OK. It leaves one test case, which staff archive from the panel.
 4. Schedule `node backend/backup.js` nightly and test one restore (`backend/README.md`, "Backups and restore").
 

@@ -25,6 +25,7 @@
  * =========================================================================== */
 
 'use strict';
+require('./env');                               // backend/.env, if present
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -34,7 +35,14 @@ const notifier = require('./notify');          // outbox + SMS/email webhook
 const events = require('./events');            // every case change to the Court's own system (webhook + log)
 
 const PORT = Number(process.env.FC_PORT || 4000);
-const ALLOW_ORIGIN = process.env.FC_ALLOW_ORIGIN || '*';
+// Cross-site access. Unset = the site and the API share one address (the backend serving
+// app/, or a proxy in front of both), so no cross-site headers are sent at all. Set it only
+// when the site is served from a different address than the API.
+const ALLOW_ORIGIN = process.env.FC_ALLOW_ORIGIN || (process.env.FC_DEV === '1' ? '*' : '');
+// The backend serves the site (app/) itself unless FC_SERVE_APP=0, so one command runs the
+// whole system; the site's API address then points at this same server.
+const APP_DIR = path.resolve(process.env.FC_APP_DIR || path.join(__dirname, '..', 'app'));
+const SERVE_APP = process.env.FC_SERVE_APP !== '0' && fs.existsSync(path.join(APP_DIR, 'form.html'));
 const TRUST_PROXY = process.env.FC_TRUST_PROXY === '1';   // trust X-Forwarded-For
 const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;      // matches the frontend
 const MAX_BODY = 25 * 1024 * 1024;                 // 25 MB (room for photos)
@@ -269,15 +277,42 @@ function send(res, code, obj) {
   const body = obj == null ? '' : JSON.stringify(obj);
   res.writeHead(code, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Origin': ALLOW_ORIGIN,
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE, OPTIONS',
+    ...corsHeaders(),
     'X-Content-Type-Options': 'nosniff',
     'Cache-Control': 'no-store',                 // every response may carry personal data
     'Referrer-Policy': 'no-referrer',
     'Vary': 'Origin'
   });
   res.end(body);
+}
+function corsHeaders() {
+  return ALLOW_ORIGIN ? { 'Access-Control-Allow-Origin': ALLOW_ORIGIN,
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE, OPTIONS' } : {};
+}
+// ── the site (app/) ─────────────────────────────────────────────────────────
+const STATIC_TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
+  '.ttf': 'font/ttf', '.woff': 'font/woff', '.woff2': 'font/woff2', '.pdf': 'application/pdf', '.webp': 'image/webp', '.gif': 'image/gif' };
+function serveApp(req, res, pathname) {
+  let rel;
+  try { rel = decodeURIComponent(pathname); } catch (e) { res.writeHead(400); res.end(); return; }
+  if (rel === '/' || rel === '') rel = '/index.html';
+  const headers = { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'Cache-Control': 'no-cache' };
+  // the site's one setting: when the backend serves the site, the API is this same address
+  if (rel === '/js/site-config.js') {
+    res.writeHead(200, Object.assign({ 'Content-Type': STATIC_TYPES['.js'] }, headers));
+    res.end('window.FC_API_BASE = window.location.origin;\n');
+    return;
+  }
+  const full = path.resolve(APP_DIR, '.' + rel);
+  if (full !== APP_DIR && !full.startsWith(APP_DIR + path.sep)) { res.writeHead(404); res.end('not found'); return; }
+  fs.stat(full, function (err, st) {
+    if (err || !st.isFile()) { res.writeHead(404, Object.assign({ 'Content-Type': 'text/plain; charset=utf-8' }, headers)); res.end('not found'); return; }
+    res.writeHead(200, Object.assign({ 'Content-Type': STATIC_TYPES[path.extname(full).toLowerCase()] || 'application/octet-stream', 'Content-Length': st.size }, headers));
+    if (req.method === 'HEAD') { res.end(); return; }
+    fs.createReadStream(full).pipe(res);
+  });
 }
 function requestId() { return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
 function readBody(req) {
@@ -326,7 +361,10 @@ const server = http.createServer(async function (req, res) {
   const method = req.method;
 
   if (method === 'OPTIONS') return send(res, 204, null);
-  if (parts[0] !== 'api') return send(res, 404, { error: 'not found' });
+  if (parts[0] !== 'api') {
+    if (SERVE_APP && (method === 'GET' || method === 'HEAD')) return serveApp(req, res, url.pathname);
+    return send(res, 404, { error: 'not found' });
+  }
 
   try {
     // ── ref validation (one shared check, closes the path-traversal) ──
@@ -571,7 +609,7 @@ const server = http.createServer(async function (req, res) {
         res.writeHead(200, {
           'Content-Type': CONTENT_TYPES[ext] || 'application/octet-stream',
           'Content-Disposition': 'inline; filename="' + fname + '"',
-          'Access-Control-Allow-Origin': ALLOW_ORIGIN,
+          ...corsHeaders(),
           'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store', 'Vary': 'Origin'
         });
         fs.createReadStream(full).pipe(res);
@@ -702,8 +740,7 @@ const server = http.createServer(async function (req, res) {
 
 if (require.main === module) {
   if (ALLOW_ORIGIN === '*' && !DEV) {
-    console.error('Refusing to start with FC_ALLOW_ORIGIN unset (CORS would be open to every website).\n' +
-      'Set FC_ALLOW_ORIGIN=https://<the Court\'s site> — or FC_DEV=1 on a development machine only.');
+    console.error("FC_ALLOW_ORIGIN=* would let every website call this API. Set the site's address, or leave it unset when the site and the API share one address.");
     process.exit(1);
   }
   server.listen(PORT, function () {
@@ -713,6 +750,8 @@ if (require.main === module) {
         ? ' (' + (process.env.FC_DB_PATH || 'data/familycourt.db') + ')'
         : ' (' + (process.env.FC_DATA_DIR || 'data') + '/*.json)'));
     console.log('  uploads: ' + UPLOAD_DIR);
+    if (SERVE_APP) console.log('  site:    http://localhost:' + PORT + '/   admin: http://localhost:' + PORT + '/admin.html');
+    console.log('  cross-site access: ' + (ALLOW_ORIGIN || 'none (site and API on one address)'));
   });
 }
 module.exports = { server, _resetRateLimits };

@@ -14,20 +14,28 @@ attachments and the audit trail.
 | Path | Contents |
 |---|---|
 | `app/` | static site, no build step: `form.html` (every form, by `?form=Fm-C-B20`), `index.html`, `wizard.html`, `status.html`, `print.html`, `admin.html`; form definitions in `app/specs/` |
-| `app/js/site-config.js` | the only frontend setting: the backend address |
 | `backend/` | Node 22.5+ service with no dependencies; SQLite or JSON storage; tests, smoke test, Dockerfile |
 | `deploy/` | nginx configuration and systemd unit; `docker-compose.yml` at the root runs the whole system |
 | `docs/` | handover, setup guide, testing guide, CSV column list |
 
 ## Quick start
 
+Requirements: Node.js 22.5 or later (or Docker). Nothing to install with npm.
+
 ```sh
 cd backend
-cp .env.example .env        # edit the paths and the site origin
-node server.js              # http://localhost:4000/api/health
-node user-cli.js add <username> "<Display name>" admin
-node test.js                # 87 checks; FC_STORE=sqlite node test.js for the SQLite store
+node user-cli.js add <username> "<Full name>" admin    # asks for a password
+node server.js
 ```
 
-Serve `app/` from any static web server (or `docker compose up -d` for both), set
-`FC_API_BASE` in `app/js/site-config.js`, and run `node backend/smoke.js <site> <username> <password>`.
+Open http://localhost:4000/ for the forms and http://localhost:4000/admin.html for the
+admin panel. The backend serves the site and the API on one address; no other setting
+is needed. Optional: `node seed-sample.js http://localhost:4000 2 <username> <password>`
+adds sample filings for every form.
+
+With Docker instead: `docker compose up -d`, then
+`docker compose exec forms node user-cli.js add <username> "<Full name>" admin`; the site
+is on port 8080.
+
+For a server installation (storage, HTTPS, service, backups) see
+`docs/INTEGRATION_HANDOVER.md`. Tests: `node backend/test.js`.

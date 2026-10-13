@@ -16,6 +16,7 @@
  *   node user-cli.js add registrar1 "Aminath Registrar" officer
  * =========================================================================== */
 'use strict';
+require('./env');   // backend/.env, if present
 const auth = require('./auth');
 
 const VALID_ROLES = ['viewer', 'officer', 'registrar', 'admin'];
