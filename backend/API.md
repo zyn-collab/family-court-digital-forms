@@ -18,7 +18,7 @@ All request/response bodies are JSON (UTF-8). Dhivehi is sent as normal UTF-8.
 | `DELETE` | `/api/drafts/:ref` | — | `{ ok: true }` | |
 | `PUT` | `/api/submissions/:ref` | `{ data }` | `{ ref_code, attachments }` | Submit. Server extracts uploaded files, stores the submission, deletes the draft. |
 | `GET` | `/api/submissions/:ref/status` | — | status object or `404` | **Public** — returns only status/history, never the full form data. When the status is `returned` it also lists `attachment_fields` (field keys of the submitted documents, no contents). |
-| `POST` | `/api/submissions/:ref/corrections` | `{ field, file }` | `{ ok, status }` | **Public, ref-gated, 10/min per IP.** Only while the case is `returned`: one replacement document (data URI, same type/size checks as submit) for `field`; the record's field points at the new file (`@file:corrN_<field>.<ext>`), the original stays, `data._corrections` lists what came in, status goes back to `processing`, audited as `correction`. |
+| `POST` | `/api/submissions/:ref/corrections` | `{ field, file }` | `{ ok, status }` | **Public, ref-gated, rate limited per connection.** Only while the case is `returned`: one replacement document (data URI, same type/size checks as submit) for `field`; the record's field points at the new file (`@file:corrN_<field>.<ext>`), the original stays, `data._corrections` lists what came in, status goes back to `processing`, audited as `correction`. |
 
 Public status object:
 ```json

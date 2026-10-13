@@ -165,8 +165,11 @@ Officers (and above) can read the trail without database access via
 
 Simple in-memory, per-IP limits protect the two endpoints that face the public:
 
-- **Admin login** — 5 attempts per minute per IP.
-- **Public status lookup** — 20 requests per minute per IP.
+- **Admin login** — 100 attempts per minute per connection, and 10 failed attempts per
+  username in 10 minutes (the second never changes: it stops password guessing on one account).
+- **Public status lookup** — 400 requests per minute per connection.
+- **Drafts** 2400, **submissions** 400, **corrections** 200, **reference numbers** 1200 per
+  minute per connection.
 
 Going over the limit returns HTTP **429** and the request is not processed. A
 blocked *login* attempt is itself audited (`login_rate_limited`); a blocked
@@ -174,9 +177,10 @@ status lookup is not. The counters live in the server's memory and reset when it
 restarts, so behind several server instances you should also enforce the real
 limit at the load balancer.
 
-Every per-address limit can be multiplied with `FC_RATE_SCALE` (default 1). Set it,
-for example, to 10 for a testing session where many people share one office connection;
-the per-username login limit is not scaled.
+The per-connection figures are a strict reference (5, 20, 120, 20, 10, 60) multiplied by
+`FC_RATE_SCALE`, default 20, so an office of testers behind one connection is never held
+back. `FC_RATE_SCALE=0` turns per-connection limits off; a lower value tightens them once the
+service is public. The per-username login limit always applies.
 
 ## Attachments
 

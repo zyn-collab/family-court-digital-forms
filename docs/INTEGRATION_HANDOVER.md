@@ -59,7 +59,7 @@ The site is on port 8080 (`deploy/nginx.conf` serves `app/` and proxies `/api/` 
 
 Everything is an environment variable; `backend/.env.example` lists every one with a production value. The frontend has exactly one setting, `FC_API_BASE` in `app/js/site-config.js`. With it empty the pages run in demonstration mode (data stays in the browser; the admin page cannot log in). With it set, every page talks to the service. Nothing else in `app/` changes between the two modes.
 
-For a test installation where many testers share one office connection, set `FC_RATE_SCALE=10` (it multiplies the per-connection request limits).
+Request limits per connection are generous by default (`FC_RATE_SCALE=20`), so an office of testers behind one connection is not held back; `0` turns them off. The limit of 10 failed logins per account in 10 minutes always applies.
 
 Variables that must change from the defaults: `FC_ALLOW_ORIGIN`, `FC_STORE=sqlite`, `FC_DB_PATH`, `FC_UPLOADS_DIR`, `FC_TRUST_PROXY=1` behind a proxy, `FC_PUBLIC_SITE`.
 
@@ -122,7 +122,7 @@ A small receiver maps this to the Court's SMS facility or the Dhiraagu / Ooredoo
 | officer | viewer plus change status with a note, read the audit log, pull `/api/admin/export` |
 | admin | officer plus manage staff accounts in the panel |
 
-Passwords are hashed; eight characters minimum. Deactivating an account or setting its password ends its open sessions. An account cannot deactivate itself. Five failed logins a minute per address, ten per ten minutes per username, lock out further attempts.
+Passwords are hashed; eight characters minimum. Deactivating an account or setting its password ends its open sessions. An account cannot deactivate itself. Ten failed logins for one username within ten minutes lock that username out for the rest of the ten minutes.
 
 ## 7. What stays with the project team
 

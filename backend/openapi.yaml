@@ -49,7 +49,7 @@ paths:
         "200": { description: saved }
         "400": { description: bad reference or data shape }
         "409": { description: the number has already been submitted }
-        "429": { description: rate limited (120/min per IP) }
+        "429": { description: "rate limited (per connection; see FC_RATE_SCALE)" }
     get:
       tags: [public]
       summary: Load a draft
@@ -82,7 +82,7 @@ paths:
       responses:
         "200": { description: status, content: { application/json: { schema: { $ref: "#/components/schemas/PublicStatus" } } } }
         "404": { description: unknown }
-        "429": { description: rate limited (20/min per IP) }
+        "429": { description: "rate limited (per connection; see FC_RATE_SCALE)" }
   /api/submissions/{ref}/corrections:
     parameters: [ { $ref: "#/components/parameters/ref" } ]
     post:
@@ -92,7 +92,7 @@ paths:
       responses:
         "200": { description: accepted; status goes back to processing }
         "400": { description: not returned, bad field or rejected file }
-        "429": { description: rate limited (10/min per IP) }
+        "429": { description: "rate limited (per connection; see FC_RATE_SCALE)" }
   /api/admin/login:
     post:
       tags: [admin]
@@ -101,7 +101,7 @@ paths:
       responses:
         "200": { description: session, content: { application/json: { schema: { type: object, properties: { token: { type: string }, display_name: { type: string }, role: { type: string, enum: [viewer, officer, admin] } } } } } }
         "401": { description: invalid credentials (same answer for unknown, wrong or deactivated) }
-        "429": { description: too many attempts (5/min per IP, 10/10 min per username) }
+        "429": { description: "too many attempts (per connection, and 10 failed attempts per username in 10 minutes)" }
   /api/admin/logout:
     post:
       tags: [admin]

@@ -145,11 +145,20 @@ purgeTimer.unref();
 // 5/min, public status is 20/min. This is per-process, so
 // behind multiple instances put the real limit at the load balancer too. ─────
 const rateBuckets = new Map();                       // key -> [timestamps]
-// FC_RATE_SCALE multiplies every per-address limit: many testers (or a whole office)
-// behind one connection share an address. The per-username login limit is not scaled.
-const RATE_SCALE = Math.max(1, Number(process.env.FC_RATE_SCALE || 1));
+// Per-connection limits. The figures written at each call below are a strict reference;
+// FC_RATE_SCALE multiplies them (default 20, so a whole office behind one connection is
+// never held back: about 100 logins, 400 status lookups and 2400 draft saves a minute).
+// FC_RATE_SCALE=0 turns per-connection limits off. The per-account login limit
+// (10 failed attempts per username in 10 minutes) is never scaled or turned off.
+const RATE_SCALE = (function () {
+  const v = Number(process.env.FC_RATE_SCALE);
+  return process.env.FC_RATE_SCALE === undefined || process.env.FC_RATE_SCALE === '' || !Number.isFinite(v) || v < 0 ? 20 : v;
+})();
 function rateAllow(key, limit, windowMs) {
-  if (key.indexOf('login-user:') !== 0) limit = Math.round(limit * RATE_SCALE);
+  if (key.indexOf('login-user:') !== 0) {
+    if (RATE_SCALE === 0) return true;
+    limit = Math.max(1, Math.round(limit * RATE_SCALE));
+  }
   const now = Date.now();
   const arr = (rateBuckets.get(key) || []).filter(function (t) { return t > now - windowMs; });
   arr.push(now);

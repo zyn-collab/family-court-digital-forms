@@ -8,9 +8,8 @@ real case.
 
 1. Install as in `docs/INTEGRATION_HANDOVER.md` section 2, on a test server with its
    own address (for example `test-forms.familycourt.gov.mv`).
-2. In `backend/.env`, set `FC_RATE_SCALE=10`. Testers in one office share one internet
-   connection, and the normal per-connection limits (5 logins a minute, for example)
-   would lock them out.
+2. Leave `FC_RATE_SCALE` at its default (20). The request limits then never affect an
+   office of testers sharing one internet connection.
 3. Set `FC_API_BASE` in `app/js/site-config.js` to the test address.
 4. Create the accounts:
    ```

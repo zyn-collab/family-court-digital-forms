@@ -18,6 +18,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 process.env.FC_OUTBOX_PATH = process.env.FC_OUTBOX_PATH || path.join(os.tmpdir(), 'fc-outbox-' + Date.now().toString(36) + '.jsonl');   // notify.js reads it at load
+process.env.FC_RATE_SCALE = '1';   // the tests check the strict reference limits (production default is 20x)
 process.env.FC_EVENT_LOG_PATH = process.env.FC_EVENT_LOG_PATH || path.join(os.tmpdir(), 'fc-events-' + Date.now().toString(36) + '.jsonl');   // events.js reads it at load
 const { server, _resetRateLimits } = require('./server.js');
 const auth = require('./auth.js');
