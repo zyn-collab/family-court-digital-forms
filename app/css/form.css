@@ -578,3 +578,6 @@ select.ss-native[hidden] + .ss-box { display: none; }   /* the typing box follow
 .step-errors-list { margin: 10px 0 0; padding-inline-start: 18px; max-height: 60vh; overflow-y: auto; }
 .step-errors-list li { margin: 6px 0; }
 [data-instructions] .instructions-block { margin-top: 0 !important; }
+
+/* a page the guided start already answered (the order type on the domestic violence form): its answer stands, the page is not opened again */
+.progress-step.prefilled, .step-item.prefilled { cursor: default !important; opacity: 0.6; }
