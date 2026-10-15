@@ -267,7 +267,13 @@
   <script src="js/spec-loader.js"></script>
   <script src="js/combine-specs.js"></script>
   <script src="js/lookups.js"></script>
+  <!-- demonstration mode (no backend address): the browser store, kept aside for js/demo-admin-store.js -->
+  <script src="js/browser-store.js"></script>
+  <script>window.BrowserStore = window.DataStore;</script>
   <script src="js/api-config.js"></script>
+  <script>window.ApiStore = window.DataStore;</script>
+  <script src="js/sample-filings.js"></script>
+  <script src="js/demo-admin-store.js"></script>
   <script src="js/export-csv.js"></script>
   <script>
   // ── session views: login vs. app. Any 'unauthorized' thrown by the adapter
@@ -320,6 +326,8 @@
       return false;
     }
     try {
+      demoMode = !!(window.FCDemoAdmin && window.FCDemoAdmin.choose());   // a backend address set after load wins
+      setupDemoUI();
       var ok = await window.DataStore.adminLogin(u, p);
       if (ok) { showApp(); }
       else {
@@ -492,7 +500,45 @@
     'status_change':      'ސްޓޭޓަސް ބަދަލުކުރި'
   };
 
+  // ── demonstration mode: no backend address, cases kept in this browser ──
+  var demoMode = false;
+  function setupDemoUI() {
+    if (!demoMode) return;
+    var card = document.querySelector('#loginView .login-card');
+    if (card && !document.getElementById('demoLoginNote')) {
+      var n = document.createElement('div');
+      n.id = 'demoLoginNote'; n.dir = 'ltr';
+      n.style.cssText = 'margin:0 0 14px;padding:10px 12px;border-radius:8px;background:#fff7e6;border:1px solid #f0c36d;font-family:var(--font-en);font-size:0.85rem;line-height:1.5;text-align:left;';
+      n.innerHTML = '<strong>Demonstration.</strong> No server is connected: cases are kept in this browser only.<br>Username <code>demo</code>, password <code>demo</code>.';
+      card.insertBefore(n, card.querySelector('form'));
+    }
+    var head = document.querySelector('#appView .admin-header');
+    if (head && !document.getElementById('demoBar')) {
+      var bar = document.createElement('div');
+      bar.id = 'demoBar';
+      bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 14px;padding:10px 14px;border-radius:10px;background:#fff7e6;border:1px solid #f0c36d;font-family:var(--font-en);font-size:0.88rem;';
+      bar.innerHTML = '<span style="flex:1;min-width:240px;"><strong>Demonstration.</strong> No server is connected: these cases are kept in this browser only. Forms filed on this site in this browser also appear here.</span>' +
+        '<button type="button" class="btn btn-secondary" id="demoLoadBtn" style="font-family:var(--font-en);">Load sample cases</button>' +
+        '<button type="button" class="btn btn-secondary" id="demoClearBtn" style="font-family:var(--font-en);">Clear all cases</button>';
+      head.parentNode.insertBefore(bar, head);
+      document.getElementById('demoLoadBtn').onclick = async function () {
+        var b = this; b.disabled = true; b.textContent = 'Loading…';
+        try { var n = await window.DataStore.loadSampleCases(1); b.textContent = n + ' sample cases added'; }
+        catch (e) { b.textContent = 'Sample cases could not be loaded'; console.error(e); }
+        setTimeout(function () { b.disabled = false; b.textContent = 'Load sample cases'; }, 2500);
+        loadSubmissions();
+      };
+      document.getElementById('demoClearBtn').onclick = async function () {
+        if (!confirm('Remove every case kept in this browser? This affects this browser only.')) return;
+        await window.DataStore.clearCases();
+        loadSubmissions();
+      };
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    demoMode = !!(window.FCDemoAdmin && window.FCDemoAdmin.choose());
+    setupDemoUI();
     window.DataStore.init();
     // Gate on the session: show the app only when a token is present, otherwise
     // the login view. (A stale token that the server rejects will trip
