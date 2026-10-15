@@ -174,6 +174,8 @@
             '<button type="button" class="wizard-restart" onclick="restart()">↺ އަލުން ފައްޓަވާ</button></div>';
     card.innerHTML = html;
     loadAtolls().then(function () {
+      // the list can arrive after the person has moved on; fill only the screen that is still showing
+      if (!document.getElementById('jurisContinue')) return;
       JURIS_QUESTIONS.forEach(function (jq) { fillAtollSelect(jq.key); restoreJuris(jq.key); });
     });
   }
@@ -182,6 +184,7 @@
     const sel = document.getElementById('atoll_' + key);
     const isl = document.getElementById('isl_' + key);
     const txt = document.getElementById('isltext_' + key);
+    if (!sel || !isl || !txt) return;
     if (!ATOLLS || !ATOLLS.length) {           // no data (file://): free-text island name
       sel.hidden = true; isl.hidden = true; txt.hidden = false;
       txt.placeholder = 'ރަށް / އަތޮޅު';

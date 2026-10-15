@@ -274,8 +274,6 @@ window.FormEngine = (function () {
     // URL ?resume= auto-load
     const params = new URLSearchParams(window.location.search);
     if (params.get('juris')) { try { wizardJuris = JSON.parse(params.get('juris')); } catch (e) { wizardJuris = null; } }
-    // the wizard's "which order" answer fills section 6 of the protection-order form
-    if (params.get('order')) { const r = document.querySelector('input[name="order_type"][value="' + params.get('order').replace(/[^a-z_]/g, '') + '"]'); if (r) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); wizardOrder = true; applyStepVisibility(); } }
     const resumeCode = params.get('resume');
     if (resumeCode) {
       await resumeFormDraft(resumeCode.toUpperCase());   // toolbar removed; resume comes from the status page link
@@ -290,6 +288,9 @@ window.FormEngine = (function () {
       if (typeof snap.step === 'number' && snap.step > 0 && snap.step < resolvedSteps.length) { maxStepReached = snap.step; showStep(snap.step); }
       issueRefCode(snap.ref);
     }
+    // the wizard's "which order" answer fills section 6 of the protection-order form. Applied
+    // after any restore, so the latest choice in the wizard wins over what this tab held before.
+    if (params.get('order')) { const r = document.querySelector('input[name="order_type"][value="' + params.get('order').replace(/[^a-z_]/g, '') + '"]'); if (r) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); wizardOrder = true; applyStepVisibility(); } }
     // a reference number is issued the
     // moment a form is opened, shown as a notice, with advice to keep it. The
     // number is drawn by the store (the server, when there is one) and checked
@@ -1724,10 +1725,16 @@ window.FormEngine = (function () {
   // submission. states the general rule:
   // nothing that an earlier answer rules out may be shown or required.
   let wizardOrder = false;   // the wizard's choice answers section 6, so its page is skipped
+  // a page whose question the wizard already answered: not shown again, but its answer
+  // stands (it counts for later questions and goes into the filing)
+  function answeredByWizard(i) {
+    const st = resolvedSteps[i];
+    return !!(wizardOrder && st && (st.fields || []).some(function (f) { return f.key === 'order_type'; }));
+  }
   function stepVisible(i) {
     const st = resolvedSteps[i];
     if (!st) return true;
-    if (wizardOrder && (st.fields || []).some(function (f) { return f.key === 'order_type'; })) return false;
+    if (answeredByWizard(i)) return false;
     if (!st.visible_when) return true;
     try { return evalCondition(st.visible_when); } catch (e) { return true; }
   }
@@ -1742,12 +1749,16 @@ window.FormEngine = (function () {
     for (let i = 0; i < resolvedSteps.length; i++) {
       const el = document.getElementById('step_' + i);
       if (!el) continue;
-      const skip = !stepVisible(i);
+      const prefilled = answeredByWizard(i);
+      const skip = !prefilled && !stepVisible(i);          // ruled out: its answers no longer count
       if (el.classList.contains('step-skipped') !== skip) changed = true;
       el.classList.toggle('step-skipped', skip);
+      el.classList.toggle('step-prefilled', prefilled);
     }
     Array.prototype.forEach.call(document.querySelectorAll('.progress-step, #stepNav .step-item'), function (el) {
-      el.classList.toggle('skipped', !stepVisible(Number(el.dataset.step)));
+      const i = Number(el.dataset.step);
+      el.classList.toggle('skipped', !answeredByWizard(i) && !stepVisible(i));
+      el.classList.toggle('prefilled', answeredByWizard(i));
     });
     return changed;
   }
